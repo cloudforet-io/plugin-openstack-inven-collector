@@ -1,0 +1,13 @@
+regions:
+  "asia-east1":
+    "name": "Taiwan"
+    "tags":
+      "latitude": "24.051196"
+      "longitude": "120.516430"
+      "continent": "asia_pacific"
+  "asia-east2":
+    "name": "Hong Kong"
+    "tags":
+      "latitude": "22.283289"
+      "longitude": "114.155851"
+      "continent": "asia_pacific"
