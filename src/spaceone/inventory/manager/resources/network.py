@@ -1,16 +1,11 @@
-from spaceone.inventory.model.network.data import NetworkModel
+from spaceone.inventory.model.resources.network import NetworkModel
 from spaceone.inventory.manager.resources.resource import BaseResource
+from spaceone.inventory.manager.resources.metadata.cloud_service_type import network as cst_network
+from spaceone.inventory.manager.resources.metadata.cloud_service import network as cs_network
 from openstack.network.v2.network import Network
 from typing import (
-    Any,
-    Iterable,
     List,
-    Dict,
-    Optional,
-    Type,
-    Union,
-    Tuple,
-    Iterator
+    Dict
 )
 
 
@@ -18,6 +13,8 @@ class NetworkResource(BaseResource):
     _model_cls = NetworkModel
     _proxy = 'network'
     _resource = 'networks'
+    _cloud_service_type_resource = cst_network.CLOUD_SERVICE_TYPE
+    _cloud_service_meta = cs_network.CLOUD_SERVICE_METADATA
 
     @property
     def resources(self) -> List[Network]:

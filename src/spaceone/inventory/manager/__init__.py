@@ -6,6 +6,5 @@ __all__ = [
     'OpenstackManager'
 ]
 
-
-def manager_list():
-    return tuple(__all__)
+def list_manager():
+    return __all__

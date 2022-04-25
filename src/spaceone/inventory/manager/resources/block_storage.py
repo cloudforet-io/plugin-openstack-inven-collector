@@ -1,18 +1,13 @@
-from spaceone.inventory.model.block_storage.data import VolumeModel
+from spaceone.inventory.model.resources.block_storage import VolumeModel
 from spaceone.inventory.manager.resources.resource import BaseResource
 from spaceone.inventory.model.common.base import ReferenceModel
+from spaceone.inventory.manager.resources.metadata.cloud_service_type import block_storage as cst_blockstorage
+from spaceone.inventory.manager.resources.metadata.cloud_service import block_storage as cs_blockstorage
 from openstack.block_storage.v2.volume import Volume
 
 from typing import (
-    Any,
-    Iterable,
     List,
-    Dict,
-    Optional,
-    Type,
-    Union,
-    Tuple,
-    Iterator
+    Dict
 )
 
 
@@ -20,6 +15,8 @@ class VolumeResource(BaseResource):
     _model_cls = VolumeModel
     _proxy = 'block_storage'
     _resource = 'volumes'
+    _cloud_service_type_resource = cst_blockstorage.CLOUD_SERVICE_TYPE
+    _cloud_service_meta = cs_blockstorage.CLOUD_SERVICE_METADATA
 
     @property
     def resources(self) -> List[Volume]:

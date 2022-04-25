@@ -1,4 +1,4 @@
-from spaceone.inventory.model import ResourceModel
+from spaceone.inventory.model.resources.base import ResourceModel
 from schematics.types import ModelType, ListType, StringType, IntType, DateTimeType, BooleanType, FloatType, DictType, IPAddressType
 
 

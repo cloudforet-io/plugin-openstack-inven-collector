@@ -8,6 +8,18 @@ from spaceone.inventory.conf.cloud_service_conf import *
 from spaceone.inventory.model.common.response import ErrorResourceResponse
 from spaceone.inventory import manager
 
+
+from typing import (
+
+    List,
+    Dict,
+    Optional,
+    Union,
+    Tuple,
+    Callable,
+    Iterator
+)
+
 __all__ = ['CollectorService']
 
 _LOGGER = logging.getLogger(__name__)
@@ -22,7 +34,7 @@ class CollectorService(BaseService):
 
 
     #@check_required(['options'])
-    def init(self, params):
+    def init(self, params) -> Dict:
         """ init plugin by options
         """
         _LOGGER.debug(params)
@@ -36,7 +48,7 @@ class CollectorService(BaseService):
 
     @transaction
     #@check_required(['options', 'secret_data'])
-    def verify(self, params):
+    def verify(self, params) -> Dict:
         """
         Args:
               params:
@@ -48,7 +60,7 @@ class CollectorService(BaseService):
 
     @transaction
     @check_required(['options', 'secret_data'])
-    def collect(self, params):
+    def collect(self, params) -> Dict:
         """
         Args:
             params:
@@ -56,13 +68,11 @@ class CollectorService(BaseService):
                 - secret_data
                 - filter
         """
-        _LOGGER.debug(params)
         start_time = time.time()
-
-        _LOGGER.debug(f'EXECUTOR START: Openstack Cloud Service')
+        _LOGGER.debug(f'EXECUTOR START: Openstack Cloud Collector Service')
         # Get target manager to collect
         try:
-            self.execute_managers = self._get_execute_manager(params.get('options', {}))
+            self.execute_managers = self._get_execute_managers(params.get('options', {}))
             _LOGGER.debug(f'[collect] execute_managers => {self.execute_managers}')
         except Exception as e:
             _LOGGER.error(f'[collect] failed to get target execute_managers => {e}', exc_info=True)
@@ -75,7 +85,7 @@ class CollectorService(BaseService):
             for execute_manager in self.execute_managers:
 
                 _manager = self.locator.get_manager(execute_manager)
-                _LOGGER.debug(_manager)
+                _LOGGER.debug(f'{_manager.__class__.__name__} module loaded')
                 future_executors.append(executor.submit(_manager.collect_resources, params))
 
             for future in concurrent.futures.as_completed(future_executors):
@@ -89,28 +99,25 @@ class CollectorService(BaseService):
 
         _LOGGER.debug(f'TOTAL TIME : {time.time() - start_time} Seconds')
 
-    def _get_execute_manager(self, options):
-
-        #execute_managers = RegionManager()
-        """
-        if 'cloud_service_types' in options and options['cloud_service_types'] == 'openstack':
-            execute_managers = OpenstackManager(options)
-        else:
-            execute_managers = []
-        """
-
-        return manager.manager_list()
-
+    @staticmethod
+    def _get_execute_managers(options) -> List['BaseManager']:
+        return manager.list_manager()
 
     @staticmethod
-    def generate_error_response(e, cloud_service_group, cloud_service_type):
-
-        error_resource_response = ErrorResourceResponse({
-            'message': lambda x: json.dumps(e) if type(e) is dict else str(e),
-            'resource': {
-                'cloud_service_group': cloud_service_group,
-                'cloud_service_type': cloud_service_type
-            }})
+    def generate_error_response(e, cloud_service_group, cloud_service_type) -> ErrorResourceResponse:
+        if type(e) is dict:
+            error_resource_response = ErrorResourceResponse({
+                'message': json.dumps(e),
+                'resource': {
+                    'cloud_service_group': cloud_service_group,
+                    'cloud_service_type': cloud_service_type
+                }})
+        else:
+            error_resource_response = ErrorResourceResponse({
+                'message': str(e),
+                'resource': {
+                    'cloud_service_group': cloud_service_group,
+                    'cloud_service_type': cloud_service_type
+                }})
 
         return error_resource_response
-

@@ -1,10 +1,13 @@
 import logging
 from schematics import Model
 from schematics.types import DateTimeType
-from spaceone.inventory.model import ResourceModel
+from spaceone.inventory.model.resources.base import ResourceModel
 from openstack.resource import Resource
 from openstack.connection import Connection
 from openstack.proxy import Proxy
+from spaceone.inventory.error.base import CollectorError
+from spaceone.inventory.model.common.response import CloudServiceTypeResource
+from spaceone.inventory.model.view.cloud_service import CloudServiceMeta
 
 from typing import (
     Any,
@@ -17,27 +20,46 @@ from typing import (
     Tuple,
     Callable,
     TypeVar,
-    Iterator
+    Iterator,
+    Final
 )
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class BaseResource(object):
+    _datetime_keys: Final[List[str]] = ['attached_at', 'created_at', 'updated_at', 'launched_at']
     _conn: Optional[Connection] = None
     _model_cls: Any = ResourceModel
     _proxy: str = ""
     _resource: str = ""
-    _datetime_keys: List[str] = ['attached_at', 'created_at', 'updated_at', 'launched_at']
+    _cloud_service_type_resource: Optional[CloudServiceTypeResource] = None
+    _cloud_service_meta: Optional[CloudServiceMeta] = None
 
     def __init__(self, conn: Connection):
         self._conn = conn
 
     @property
+    def cloud_service_meta(self) -> CloudServiceMeta:
+        return self._cloud_service_meta
+
+    @property
+    def cloud_service_type_resource(self) -> CloudServiceTypeResource:
+        return self._cloud_service_type_resource
+
+    @property
+    def cloud_service_type_name(self) -> str:
+        return self._cloud_service_type_resource.name
+
+    @property
+    def cloud_service_group_name(self) -> str:
+        return self._cloud_service_type_resource.group
+
+    @property
     def resources(self) -> List[Any]:
 
         if self._conn is None:
-            raise
+            raise CollectorError(message='secret_data must exist')
 
         if hasattr(self._conn, self._proxy):
             proxy_obj = getattr(self._conn, self._proxy)
@@ -55,7 +77,7 @@ class BaseResource(object):
     def _set_default_model_obj_values(self, model_obj: Any, resource: Any):
         pass
 
-    def _create_obj(self, model_cls: ResourceModel, resource: Resource) -> ResourceModel:
+    def _create_obj(self, model_cls: ResourceModel, resource: Resource) -> (ResourceModel, Resource):
 
         model_obj = model_cls()
 
@@ -73,12 +95,8 @@ class BaseResource(object):
 
         return model_obj
 
-    def collect(self, **kwargs) -> List[ResourceModel]:
-
-        resources = []
+    def collect(self, **kwargs) -> Iterator[Tuple[ResourceModel, 'BaseResource']]:
 
         for resource in self.resources:
             _LOGGER.debug(resource.to_dict())
-            resources.append(self._create_obj(self._model_cls, resource))
-
-        return resources
+            yield self._create_obj(self._model_cls, resource), self

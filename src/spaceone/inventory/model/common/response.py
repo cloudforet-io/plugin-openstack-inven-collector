@@ -1,7 +1,10 @@
 from schematics import Model
 from spaceone.inventory.model.common.region import RegionModel
-from spaceone.inventory.model import ResourceModel
-from schematics.types import ListType, StringType, PolyModelType, DictType, ModelType, FloatType
+from spaceone.inventory.model.common.base import ErrorResource
+from spaceone.inventory.model.common.base import CloudServiceTypeResource
+from spaceone.inventory.model.common.base import CloudServiceResource
+from schematics.types import ListType, StringType, PolyModelType, DictType, ModelType
+
 
 class BaseResponse(Model):
     state = StringType(default='SUCCESS', choices=('SUCCESS', 'FAILURE', 'TIMEOUT'))
@@ -11,30 +14,34 @@ class BaseResponse(Model):
     resource = PolyModelType(Model, default={})
 
 
+class RegionResponse(BaseResponse):
+    resource_type = StringType(default='inventory.Region')
+    match_rules = DictType(ListType(StringType), default={'1': ['provider', 'region_code']})
+    resource = PolyModelType(RegionModel)
+
+
+class CloudServiceTypeResponse(BaseResponse):
+    resource_type = StringType(default='inventory.CloudServiceType')
+    match_rules = DictType(ListType(StringType), default={'1': ['name', 'group', 'provider']})
+    resource = PolyModelType(CloudServiceTypeResource)
+
+
+class CloudServiceTypeResourceResponse(BaseResponse):
+    state = StringType(default='SUCCESS')
+    resource_type = StringType(default='inventory.CloudServiceType')
+    match_rules = DictType(ListType(StringType), default={'1': ['name', 'group', 'provider']})
+    resource = PolyModelType(CloudServiceTypeResource)
+
+
 class CloudServiceResponse(BaseResponse):
     match_rules = DictType(ListType(StringType), default={
-        '1': ['reference.self_link', 'provider', 'cloud_service_type', 'cloud_service_group']
+        '1': ['id', 'provider', 'cloud_service_type', 'cloud_service_group', 'project_id']
     })
     resource_type = StringType(default='inventory.CloudService')
-    resources = ListType(ModelType(ResourceModel), serialize_when_none=False)
-
-
-class ErrorResource(Model):
-    resource_type = StringType(default='inventory.CloudService')
-    provider = StringType(default="openstack")
-    cloud_service_group = StringType(default='ComputeEngine', serialize_when_none=False)
-    cloud_service_type = StringType(default='Instance', serialize_when_none=False)
-    resource_id = StringType(serialize_when_none=False)
+    resource = PolyModelType(CloudServiceResource)
 
 
 class ErrorResourceResponse(CloudServiceResponse):
     state = StringType(default='FAILURE')
     resource_type = StringType(default='inventory.ErrorResource')
     resource = ModelType(ErrorResource, default={})
-
-
-class RegionResponse(BaseResponse):
-    resource_type = StringType(default='inventory.Region')
-    match_rules = DictType(ListType(StringType), default={'1': ['provider', 'region_code']})
-    resource = PolyModelType(RegionModel)
-
