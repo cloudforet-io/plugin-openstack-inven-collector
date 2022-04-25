@@ -1,4 +1,4 @@
-from spaceone.inventory.model import ResourceModel
+from spaceone.inventory.model.resources.base import ResourceModel
 from spaceone.inventory.model.common.base import ReferenceModel
 from schematics.types import ModelType, ListType, StringType, IntType, DateTimeType, BooleanType, FloatType, DictType
 
@@ -24,5 +24,3 @@ class VolumeModel(ResourceModel):
     created_at = DateTimeType()
     launched_at = DateTimeType()
     reference = ModelType(ReferenceModel, serialize_when_none=False)
-    cloud_service_group = StringType(default='Instance')
-    cloud_service_type = StringType(default='Volume')

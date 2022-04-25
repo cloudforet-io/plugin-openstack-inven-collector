@@ -1,4 +1,4 @@
-from spaceone.inventory.model import ResourceModel
+from spaceone.inventory.model.resources.base import ResourceModel
 from spaceone.inventory.model.common.base import ReferenceModel
 from schematics.types.serializable import serializable
 
@@ -47,5 +47,3 @@ class InstanceModel(ResourceModel):
     launched_at = DateTimeType()
     flavor = ModelType(FlavorModel, serialize_when_none=False)
     reference = ModelType(ReferenceModel, serialize_when_none=False)
-    cloud_service_group = StringType(default='Instance')
-    cloud_service_type = StringType(default='Instance')
