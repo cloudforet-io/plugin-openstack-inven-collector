@@ -1,13 +1,13 @@
 regions:
-  "asia-east1":
-    "name": "Taiwan"
+  "RegionOne":
+    "name": "SeongNam"
     "tags":
-      "latitude": "24.051196"
-      "longitude": "120.516430"
+      "latitude": "37.399166244045"
+      "longitude": "127.09667325779"
       "continent": "asia_pacific"
-  "asia-east2":
-    "name": "Hong Kong"
+  "asia-east-3":
+    "name": "Seoul"
     "tags":
-      "latitude": "22.283289"
-      "longitude": "114.155851"
+      "latitude": "37"
+      "longitude": "126"
       "continent": "asia_pacific"

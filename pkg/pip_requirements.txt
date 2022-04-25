@@ -1,2 +1,4 @@
+spaceone-core
+spaceone-api
 openstacksdk
 schematics

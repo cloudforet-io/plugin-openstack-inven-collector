@@ -1,21 +1,14 @@
-from spaceone.inventory.model.compute.data import InstanceModel
-from spaceone.inventory.model.compute.data import FlavorModel
+from spaceone.inventory.model.resources.compute import InstanceModel
+from spaceone.inventory.model.resources.compute import FlavorModel
 from spaceone.inventory.model.common.base import ReferenceModel
 from spaceone.inventory.manager.resources.resource import BaseResource
+from spaceone.inventory.manager.resources.metadata.cloud_service_type import compute as cst_compute
+from spaceone.inventory.manager.resources.metadata.cloud_service import compute as cs_compute
 from openstack.compute.v2.server import Server
-from openstack.compute.v2.flavor import Flavor
-import copy
 
 from typing import (
-    Any,
-    Iterable,
     List,
-    Dict,
-    Optional,
-    Type,
-    Union,
-    Tuple,
-    Iterator
+    Dict
 )
 
 
@@ -23,6 +16,8 @@ class InstanceResource(BaseResource):
     _model_cls = InstanceModel
     _proxy = 'compute'
     _resource = 'servers'
+    _cloud_service_type_resource = cst_compute.CLOUD_SERVICE_TYPE
+    _cloud_service_meta = cs_compute.CLOUD_SERVICE_METADATA
 
     @property
     def resources(self) -> List[Server]:
@@ -63,4 +58,5 @@ class FlavorResource(BaseResource):
     _model_cls = FlavorModel
     _proxy = 'compute'
     _resource = 'flavors'
-
+    _cloud_service_type = 'Flavor'
+    _cloud_service_group = 'Compute'
