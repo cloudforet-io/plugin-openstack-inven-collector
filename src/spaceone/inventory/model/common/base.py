@@ -9,12 +9,11 @@ class Labels(Model):
     value = StringType()
 
 
-class ReferenceModel(Model):
+class CloudServiceReferenceModel(Model):
     class Option:
         serialize_when_none = False
 
-    bookmark_link = StringType(required=False, serialize_when_none=False)
-    self_link = StringType(required=False, serialize_when_none=False)
+    resource_id = StringType(required=False, serialize_when_none=False)
 
 
 class CloudServiceResource(Model):
@@ -30,7 +29,7 @@ class CloudServiceResource(Model):
     region_code = StringType()
     data = PolyModelType(Model, default=lambda: {})
     tags = ListType(ModelType(Labels), serialize_when_none=False)
-    reference = ModelType(ReferenceModel)
+    reference = ModelType(CloudServiceReferenceModel)
     _metadata = PolyModelType(CloudServiceMeta, serialize_when_none=False, serialized_name='metadata')
 
 

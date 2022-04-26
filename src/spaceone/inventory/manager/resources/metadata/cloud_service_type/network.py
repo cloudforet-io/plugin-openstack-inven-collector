@@ -21,15 +21,15 @@ vol_total_size_by_state_conf = os.path.join(current_dir, 'widget/vol_total_size_
 """
 CLOUD_SERVICE_TYPE = CloudServiceTypeResource()
 CLOUD_SERVICE_TYPE.provider = 'openstack'
-CLOUD_SERVICE_TYPE.name = 'Instance'
+CLOUD_SERVICE_TYPE.name = 'Network'
 CLOUD_SERVICE_TYPE.group = 'Compute'
-CLOUD_SERVICE_TYPE.labels = ['Compute']
+CLOUD_SERVICE_TYPE.labels = ['Compute', 'Network']
 CLOUD_SERVICE_TYPE.is_primary = True
 CLOUD_SERVICE_TYPE.is_major = True
-CLOUD_SERVICE_TYPE.service_code = 'OSCompute'
+CLOUD_SERVICE_TYPE.service_code = 'OSNetwork'
 CLOUD_SERVICE_TYPE.tags = {
     'spaceone:icon': 'https://wiki.openstack.org/w/images/2/2c/Nova-complete-300.svg',
-    'spaceone:display_name': 'Instance'
+    'spaceone:display_name': 'Network'
 }
 CLOUD_SERVICE_TYPE._metadata = CloudServiceTypeMeta.set_meta(
     fields=[

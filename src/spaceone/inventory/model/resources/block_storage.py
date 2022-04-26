@@ -1,5 +1,4 @@
 from spaceone.inventory.model.resources.base import ResourceModel
-from spaceone.inventory.model.common.base import ReferenceModel
 from schematics.types import ModelType, ListType, StringType, IntType, DateTimeType, BooleanType, FloatType, DictType
 
 
@@ -23,4 +22,3 @@ class VolumeModel(ResourceModel):
     volume_image_metadata = DictType(StringType, serialize_when_none=False)
     created_at = DateTimeType()
     launched_at = DateTimeType()
-    reference = ModelType(ReferenceModel, serialize_when_none=False)

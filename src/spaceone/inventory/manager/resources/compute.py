@@ -1,6 +1,6 @@
 from spaceone.inventory.model.resources.compute import InstanceModel
 from spaceone.inventory.model.resources.compute import FlavorModel
-from spaceone.inventory.model.common.base import ReferenceModel
+from spaceone.inventory.model.resources.base import ReferenceModel
 from spaceone.inventory.manager.resources.resource import BaseResource
 from spaceone.inventory.manager.resources.metadata.cloud_service_type import compute as cst_compute
 from spaceone.inventory.manager.resources.metadata.cloud_service import compute as cs_compute
@@ -42,6 +42,16 @@ class InstanceResource(BaseResource):
                     dic['bookmark_link'] = link['href']
 
             self._set_obj_key_value(model_obj, 'reference', ReferenceModel(dic))
+
+        if hasattr(resource, 'addresses'):
+            minimal_addresses = []
+            addresses = resource.addresses
+            for network_name, network_values in addresses.items():
+                for network_value in network_values:
+                    if 'addr' in network_value:
+                        minimal_addresses.append(network_value.get("addr"))
+
+            self._set_obj_key_value(model_obj, 'minimal_addresses', minimal_addresses)
 
         if hasattr(resource, 'flavor'):
 
