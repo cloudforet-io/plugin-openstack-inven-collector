@@ -1,5 +1,4 @@
 from spaceone.inventory.model.resources.base import ResourceModel
-from spaceone.inventory.model.common.base import ReferenceModel
 from schematics.types.serializable import serializable
 
 from schematics.types import ModelType, ListType, StringType, IntType, DateTimeType, BooleanType, FloatType, DictType, IPAddressType
@@ -41,9 +40,9 @@ class InstanceModel(ResourceModel):
     status = StringType()
     attached_volumes = ListType(StringType, default=[])
     addresses = DictType(StringType)
+    minimal_addresses = ListType(IPAddressType, default=[])
     security_groups = ListType(StringType, default=[])
     created_at = DateTimeType()
     updated_at = DateTimeType()
     launched_at = DateTimeType()
     flavor = ModelType(FlavorModel, serialize_when_none=False)
-    reference = ModelType(ReferenceModel, serialize_when_none=False)

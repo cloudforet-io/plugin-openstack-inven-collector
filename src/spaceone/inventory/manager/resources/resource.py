@@ -29,8 +29,8 @@ _LOGGER = logging.getLogger(__name__)
 
 class BaseResource(object):
     _datetime_keys: Final[List[str]] = ['attached_at', 'created_at', 'updated_at', 'launched_at']
-    _conn: Optional[Connection] = None
     _model_cls: Any = ResourceModel
+    _conn: Optional[Connection] = None
     _proxy: str = ""
     _resource: str = ""
     _cloud_service_type_resource: Optional[CloudServiceTypeResource] = None

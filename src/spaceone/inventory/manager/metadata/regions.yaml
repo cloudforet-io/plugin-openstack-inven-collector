@@ -1,11 +1,11 @@
 regions:
   "RegionOne":
-    "name": "SeongNam"
+    "name": "Seongnam"
     "tags":
-      "latitude": "37.399166244045"
-      "longitude": "127.09667325779"
+      "latitude": "37"
+      "longitude": "127"
       "continent": "asia_pacific"
-  "asia-east-3":
+  "RegionTwo":
     "name": "Seoul"
     "tags":
       "latitude": "37"

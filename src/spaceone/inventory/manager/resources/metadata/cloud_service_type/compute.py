@@ -43,12 +43,12 @@ CLOUD_SERVICE_TYPE._metadata = CloudServiceTypeMeta.set_meta(
             'alert': ['ERROR']
         }),
         TextDyField.data_source('Flavor', 'data.flavor.name'),
-        TextDyField.data_source('IP Address', 'data.addresses'),
+        TextDyField.data_source('IP Address', 'data.minimal_addresses'),
         TextDyField.data_source('Key Name', 'data.key_name'),
         TextDyField.data_source('Availablity Zone', 'data.availability_zone'),
         ListDyField.data_source('Volumes', 'data.attached_volumes'),
         ListDyField.data_source('Security Groups', 'data.security_groups'),
-        DateTimeDyField.data_source('Created', 'data.create_time')
+        DateTimeDyField.data_source('Created', 'data.created_at')
     ],
     search=[
         SearchField.set(name='ID', key='data.id'),
