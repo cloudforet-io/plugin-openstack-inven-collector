@@ -4,5 +4,5 @@ SUPPORTED_RESOURCE_TYPE = ['inventory.CloudService',
                            'inventory.Region',
                            'inventory.ErrorResource' ]
 SUPPORTED_FEATURES = ['garbage_collection']
-SUPPORTED_SCHEDULES = ['hours']
+SUPPORTED_SCHEDULES = ['hours', 'interval']
 FILTER_FORMAT = []

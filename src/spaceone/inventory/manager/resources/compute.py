@@ -1,6 +1,6 @@
 from spaceone.inventory.model.resources.compute import InstanceModel
 from spaceone.inventory.model.resources.compute import FlavorModel
-from spaceone.inventory.model.resources.base import ReferenceModel
+from spaceone.inventory.model.resources.block_storage import VolumeModel
 from spaceone.inventory.manager.resources.resource import BaseResource
 from spaceone.inventory.manager.resources.metadata.cloud_service_type import compute as cst_compute
 from spaceone.inventory.manager.resources.metadata.cloud_service import compute as cs_compute
@@ -18,6 +18,7 @@ class InstanceResource(BaseResource):
     _resource = 'servers'
     _cloud_service_type_resource = cst_compute.CLOUD_SERVICE_TYPE
     _cloud_service_meta = cs_compute.CLOUD_SERVICE_METADATA
+    _project_resource = "/project/instances/"
 
     @property
     def resources(self) -> List[Server]:
@@ -29,19 +30,18 @@ class InstanceResource(BaseResource):
         if hasattr(resource, 'location') and hasattr(resource.location, 'region_name'):
             self._set_obj_key_value(model_obj, 'region_name', resource.location.region_name)
 
-        if hasattr(resource, 'links'):
-            dic = {}
+        if hasattr(resource, 'security_groups') and getattr(resource, 'security_groups') is not None:
+            security_groups = list(dic['name'] for dic in resource.security_groups)
+            self._set_obj_key_value(model_obj, 'security_groups', security_groups)
 
-            links = resource.links
+        if hasattr(resource, 'attached_volumes') and getattr(resource, 'attached_volumes') is not None:
+            attached_ids = list(dic['id'] for dic in resource.attached_volumes)
+            attached_volumes = []
 
-            for link in links:
-                if link['rel'] == 'self':
-                    dic['self_link'] = link['href']
+            for attached_id in attached_ids:
+                attached_volumes.append(VolumeModel({"id": attached_id}))
 
-                if link['rel'] == 'bookmark':
-                    dic['bookmark_link'] = link['href']
-
-            self._set_obj_key_value(model_obj, 'reference', ReferenceModel(dic))
+            self._set_obj_key_value(model_obj, 'volumes', attached_volumes)
 
         if hasattr(resource, 'addresses'):
             minimal_addresses = []

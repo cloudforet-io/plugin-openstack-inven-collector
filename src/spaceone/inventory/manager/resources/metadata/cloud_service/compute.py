@@ -17,10 +17,15 @@ CLOUD_SERVICE_BASE = ItemDynamicLayout.set_fields('Instance', fields=[
     TextDyField.data_source('IP Address', 'data.addresses'),
     TextDyField.data_source('Key Name', 'data.key_name'),
     TextDyField.data_source('Availablity Zone', 'data.availability_zone'),
-    TextDyField.data_source('Availablity Zone', 'dara.reference.ex'),
-    ListDyField.data_source('Volumes', 'data.attached_volumes'),
+    ListDyField.data_source('Attached Volumes', 'data.attached_volumes'),
+    ListDyField.data_source('Volumes', 'data.volumes.id', reference={"resource_type": "inventory.CloudService",
+                            "reference_key": "reference.resource_id"}),
     ListDyField.data_source('Security Groups', 'data.security_groups'),
-    DateTimeDyField.data_source('Created', 'data.create_time')
+    DateTimeDyField.data_source('Created', 'data.created_at'),
+    DateTimeDyField.data_source('Updated', 'data.updated_at'),
+    TextDyField.data_source('selfLink', 'data.reference.self_link'),
+    TextDyField.data_source('bookmarkLink', 'data.reference.bookmark_link'),
+    TextDyField.data_source('ExternalLink', 'data.reference.external_link'),
 ])
 
 CLOUD_SERVICE_TAGS = SimpleTableDynamicLayout.set_tags()

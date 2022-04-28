@@ -12,6 +12,7 @@ class NetworkModel(ResourceModel):
     floating_ip = StringType()
     availability_zones = ListType(StringType, default=[])
     mac = StringType()
+    is_admin_state_up = BooleanType()
     is_port_security_enabled = BooleanType()
     is_router_external = BooleanType()
     is_shared = BooleanType()

@@ -15,6 +15,7 @@ class NetworkResource(BaseResource):
     _resource = 'networks'
     _cloud_service_type_resource = cst_network.CLOUD_SERVICE_TYPE
     _cloud_service_meta = cs_network.CLOUD_SERVICE_METADATA
+    _project_resource = "/project/networks/"
 
     @property
     def resources(self) -> List[Network]:

@@ -42,13 +42,18 @@ CLOUD_SERVICE_TYPE._metadata = CloudServiceTypeMeta.set_meta(
             'disable': ['DELETED'],
             'alert': ['ERROR']
         }),
-        TextDyField.data_source('Flavor', 'data.flavor.name'),
-        TextDyField.data_source('IP Address', 'data.addresses'),
-        TextDyField.data_source('Key Name', 'data.key_name'),
-        TextDyField.data_source('Availablity Zone', 'data.availability_zone'),
-        ListDyField.data_source('Volumes', 'data.attached_volumes'),
-        ListDyField.data_source('Security Groups', 'data.security_groups'),
-        DateTimeDyField.data_source('Created', 'data.create_time')
+        TextDyField.data_source('Size(GB)', 'data.size'),
+        TextDyField.data_source('Image', 'data.volume_image_metadata.image_name'),
+        TextDyField.data_source('Type', 'data.volume_type'),
+        TextDyField.data_source('Multiattach', 'data.multiattach'),
+        TextDyField.data_source('Attached', 'data.attachments'),
+        TextDyField.data_source('Availability Zone', 'data.availability_zone'),
+        TextDyField.data_source('Bootable', 'data.is_bootable'),
+        TextDyField.data_source('Source Volume ID', 'data.source_volume_id'),
+        TextDyField.data_source('Host', 'data.host'),
+        DateTimeDyField.data_source('Encrypted', 'data.is_encrypted'),
+        DateTimeDyField.data_source('Created', 'data.created_at'),
+        DateTimeDyField.data_source('Updated', 'data.updated_at')
     ],
     search=[
         SearchField.set(name='ID', key='data.id'),
