@@ -17,6 +17,7 @@ class VolumeResource(BaseResource):
     _resource = 'volumes'
     _cloud_service_type_resource = cst_blockstorage.CLOUD_SERVICE_TYPE
     _cloud_service_meta = cs_blockstorage.CLOUD_SERVICE_METADATA
+    _external_link_url = "/project/volumes/"
 
     @property
     def resources(self) -> List[Volume]:
@@ -29,15 +30,3 @@ class VolumeResource(BaseResource):
 
         if hasattr(resource, 'attachments') and len(resource.attachments) > 1:
             self._set_obj_key_value(model_obj, 'multiattach', True)
-
-        if hasattr(resource, 'links'):
-            dic = {}
-
-            for link in resource.links:
-                if link['rel'] == 'self':
-                    dic['self_link'] = link['href']
-
-                if link['rel'] == 'bookmark':
-                    dic['bookmark_link'] = link['href']
-
-            self._set_obj_key_value(model_obj, 'reference', ReferenceModel(dic))

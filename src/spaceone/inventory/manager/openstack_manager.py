@@ -34,17 +34,18 @@ __all__ = ['OpenstackManager']
 
 
 class OpenstackManager(BaseManager):
-
     _resource_cls_list: List[Callable[[Optional[Connection]], 'BaseResource']] = [InstanceResource, VolumeResource,
                                                                                   NetworkResource]
     _resource_obj_list: List[BaseResource] = []
     _secret_data: Dict = {}
+    _options: Dict = {}
     __conn: Optional[Connection] = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._resource_obj_list = []
         self._secret_data = {}
+        self._options = {}
         self.__conn = None
 
     @property
@@ -110,21 +111,27 @@ class OpenstackManager(BaseManager):
         except Exception as e:
             raise CollectorError(message='Creating openstack connection failed', cause=e)
 
-    def _create_resource_objs(self, filter_params: Dict = None) -> None:
+    def _set_options(self, options: Dict = None) -> None:
+        self._options = copy.deepcopy(options)
 
-        filters = []
+    def _create_resource_objs(self, **kwargs) -> None:
 
-        if 'cloud_service_types' in filter_params and isinstance(filter_params.get('cloud_service_types'), list):
-            filters = filter_params.get('cloud_service_types')
+        cloud_service_types = []
 
-        _LOGGER.debug(f"Filter List : {filters}")
+        options = kwargs.get('options')
+
+        if options and options.get('cloud_service_types'):
+            if isinstance(options.get('cloud_service_types'), list):
+                cloud_service_types = options.get('cloud_service_types')
+
+        _LOGGER.debug(f"Collect target cloud service types : {cloud_service_types}")
 
         # Add resources object type for collecting
         _LOGGER.debug(f"Total resource class list : {self._resource_cls_list}")
         for resource_cls in self._resource_cls_list:
-            resource_obj = resource_cls(self.conn)
+            resource_obj = resource_cls(self.conn, secret_data=kwargs.get('secret_data'))
 
-            if len(filters) == 0 or resource_obj.cloud_service_type_name in filters:
+            if len(cloud_service_types) == 0 or resource_obj.cloud_service_type_name in cloud_service_types:
                 self._resource_obj_list.append(resource_obj)
                 _LOGGER.debug(f"Resource Added : {resource_obj.cloud_service_type_name}")
 
@@ -137,13 +144,22 @@ class OpenstackManager(BaseManager):
             -> Iterator[CloudServiceResponse]:
 
         for collected_resource_model, resource_obj in collected_resources:
+
+            # resource_id must exist in reference
+            reference = CloudServiceReferenceModel({"resource_id": collected_resource_model.id})
+
+            if hasattr(collected_resource_model, 'reference') and \
+                    getattr(collected_resource_model, 'reference') is not None:
+                reference.external_link = collected_resource_model.reference.external_link
+
             resource = CloudServiceResource({'data': collected_resource_model,
                                              'account': self.project_id,
-                                             'reference': CloudServiceReferenceModel({"resource_id": collected_resource_model.id}),
+                                             'reference': reference,
                                              'region_code': self.region_code,
                                              '_metadata': resource_obj.cloud_service_meta,
                                              'cloud_service_group': resource_obj.cloud_service_group_name,
                                              'cloud_service_type': resource_obj.cloud_service_type_name})
+
             _LOGGER.debug(resource.to_primitive())
             yield CloudServiceResponse({'resource': resource})
 
@@ -160,9 +176,7 @@ class OpenstackManager(BaseManager):
 
         self._set_connection(params.get('secret_data'))
 
-        filter_params = params.get('filter')
-
-        self._create_resource_objs(filter_params)
+        self._create_resource_objs(secret_data=params.get('secret_data'), options=params.get('options'))
 
         for resource_obj in self._resource_obj_list:
             cloud_svc_type_response = self._create_cloud_service_type_response(resource_obj)

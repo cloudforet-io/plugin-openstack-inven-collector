@@ -14,6 +14,7 @@ class CloudServiceReferenceModel(Model):
         serialize_when_none = False
 
     resource_id = StringType(required=False, serialize_when_none=False)
+    external_link = StringType(required=False, serialize_when_none=False)
 
 
 class CloudServiceResource(Model):

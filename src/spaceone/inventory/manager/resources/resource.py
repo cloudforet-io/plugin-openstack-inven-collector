@@ -8,6 +8,8 @@ from openstack.proxy import Proxy
 from spaceone.inventory.error.base import CollectorError
 from spaceone.inventory.model.common.response import CloudServiceTypeResource
 from spaceone.inventory.model.view.cloud_service import CloudServiceMeta
+from spaceone.inventory.model.resources.base import ReferenceModel
+from urllib.parse import urljoin
 
 from typing import (
     Any,
@@ -35,9 +37,18 @@ class BaseResource(object):
     _resource: str = ""
     _cloud_service_type_resource: Optional[CloudServiceTypeResource] = None
     _cloud_service_meta: Optional[CloudServiceMeta] = None
+    _project_resource: str = ""
+    _dashboard_url: Optional[str] = None
+    _collaboration_resources: List['BaseResource'] = []
 
-    def __init__(self, conn: Connection):
+    def __init__(self, conn: Connection, **kwargs):
         self._conn = conn
+        self._dashboard_url = None
+        self._external_link = ""
+
+        if kwargs.get('secret_data'):
+            if 'dashboard_url' in kwargs.get('secret_data'):
+                self._dashboard_url = kwargs.get('secret_data').get('dashboard_url')
 
     @property
     def cloud_service_meta(self) -> CloudServiceMeta:
@@ -54,6 +65,14 @@ class BaseResource(object):
     @property
     def cloud_service_group_name(self) -> str:
         return self._cloud_service_type_resource.group
+
+    @property
+    def external_link(self) -> str:
+
+        if self._dashboard_url is None:
+            return None
+
+        return urljoin(self._dashboard_url, self._project_resource)
 
     @property
     def resources(self) -> List[Any]:
@@ -77,6 +96,24 @@ class BaseResource(object):
     def _set_default_model_obj_values(self, model_obj: Any, resource: Any):
         pass
 
+    def _set_default_model_obj_reference(self, model_obj: Any, resource: Any):
+
+        if hasattr(resource, 'links'):
+
+            dic = {}
+
+            for link in resource.links:
+                if link['rel'] == 'self':
+                    dic['self_link'] = link['href']
+
+                if link['rel'] == 'bookmark':
+                    dic['bookmark_link'] = link['href']
+
+                if self.external_link is not None:
+                    dic['external_link'] = urljoin(self.external_link, resource.id)
+
+            self._set_obj_key_value(model_obj, 'reference', ReferenceModel(dic))
+
     def _create_obj(self, model_cls: ResourceModel, resource: Resource) -> (ResourceModel, Resource):
 
         model_obj = model_cls()
@@ -92,6 +129,7 @@ class BaseResource(object):
                     setattr(model_obj, key, value)
 
         self._set_default_model_obj_values(model_obj, resource)
+        self._set_default_model_obj_reference(model_obj, resource)
 
         return model_obj
 

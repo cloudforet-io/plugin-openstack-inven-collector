@@ -13,13 +13,14 @@ CLOUD_SERVICE_BASE = ItemDynamicLayout.set_fields('Instance', fields=[
         'disable': ['DELETED'],
         'alert': ['ERROR']
     }),
-    TextDyField.data_source('Flavor', 'data.flavor.name'),
-    TextDyField.data_source('IP Address', 'data.addresses'),
-    TextDyField.data_source('Key Name', 'data.key_name'),
+    ListDyField.data_source('Segments', 'data.segments'),
+    ListDyField.data_source('Subnet ids', 'data.subnet_ids'),
+    TextDyField.data_source('MTU', 'data.mtu'),
     TextDyField.data_source('Availablity Zone', 'data.availability_zone'),
-    ListDyField.data_source('Volumes', 'data.attached_volumes'),
-    ListDyField.data_source('Security Groups', 'data.security_groups'),
-    DateTimeDyField.data_source('Created', 'data.create_time')
+    TextDyField.data_source('Shared', 'data.is_shared'),
+    TextDyField.data_source('Vlan Transparent', 'data.vlan_transparent'),
+    DateTimeDyField.data_source('Created', 'data.created_at'),
+    DateTimeDyField.data_source('Updated', 'data.updated_at')
 ])
 
 CLOUD_SERVICE_TAGS = SimpleTableDynamicLayout.set_tags()

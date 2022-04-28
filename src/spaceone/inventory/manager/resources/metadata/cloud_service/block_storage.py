@@ -4,7 +4,7 @@ from spaceone.inventory.model.view.dynamic_layout import ItemDynamicLayout, Simp
 from spaceone.inventory.model.view.cloud_service import CloudServiceMeta
 
 #  Compute
-CLOUD_SERVICE_BASE = ItemDynamicLayout.set_fields('Instance', fields=[
+CLOUD_SERVICE_BASE = ItemDynamicLayout.set_fields('Volume', fields=[
     TextDyField.data_source('ID', 'data.id'),
     EnumDyField.data_source('State', 'data.status', default_state={
         'safe': ['ACTIVE'],
@@ -13,14 +13,17 @@ CLOUD_SERVICE_BASE = ItemDynamicLayout.set_fields('Instance', fields=[
         'disable': ['DELETED'],
         'alert': ['ERROR']
     }),
-    TextDyField.data_source('Flavor', 'data.flavor.name'),
-    TextDyField.data_source('IP Address', 'data.addresses'),
-    TextDyField.data_source('Key Name', 'data.key_name'),
-    TextDyField.data_source('Availablity Zone', 'data.availability_zone'),
-    TextDyField.data_source('selfLink', 'data.reference.self_link'),
-    ListDyField.data_source('Volumes', 'data.attached_volumes'),
-    ListDyField.data_source('Security Groups', 'data.security_groups'),
-    DateTimeDyField.data_source('Created', 'data.create_time')
+    TextDyField.data_source('Size(GB)', 'data.size'),
+    TextDyField.data_source('Type', 'data.volume_type'),
+    TextDyField.data_source('Multiattached', 'data.multiattach'),
+    TextDyField.data_source('Attached', 'data.attachments'),
+    TextDyField.data_source('Availability Zone', 'data.availability_zone'),
+    TextDyField.data_source('Bootable', 'data.is_bootable'),
+    TextDyField.data_source('Source Volume ID', 'data.source_volume_id'),
+    TextDyField.data_source('Image Info', 'data.volume_image_metadata'),
+    DateTimeDyField.data_source('Encrypted', 'data.is_encrypted '),
+    DateTimeDyField.data_source('Created', 'data.created_at'),
+    DateTimeDyField.data_source('Updated', 'data.updated_at', options={'is_optional': True})
 ])
 
 CLOUD_SERVICE_TAGS = SimpleTableDynamicLayout.set_tags()

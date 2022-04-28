@@ -1,13 +1,10 @@
 from spaceone.inventory.model.resources.base import ResourceModel
-from schematics.types.serializable import serializable
+from spaceone.inventory.model.resources.block_storage import VolumeModel
+
 
 from schematics.types import ModelType, ListType, StringType, IntType, DateTimeType, BooleanType, FloatType, DictType, IPAddressType
 
 class FlavorModel(ResourceModel):
-
-    #@serializable
-    #def name(self):
-    #    return self.original_name
 
     name = StringType()
     original_name = StringType(serialize_when_none=False)
@@ -42,7 +39,9 @@ class InstanceModel(ResourceModel):
     addresses = DictType(StringType)
     minimal_addresses = ListType(IPAddressType, default=[])
     security_groups = ListType(StringType, default=[])
+    minimal_security_groups = ListType(StringType, default=[])
     created_at = DateTimeType()
     updated_at = DateTimeType()
     launched_at = DateTimeType()
     flavor = ModelType(FlavorModel, serialize_when_none=False)
+    volumes = ListType(ModelType(VolumeModel), default=[])

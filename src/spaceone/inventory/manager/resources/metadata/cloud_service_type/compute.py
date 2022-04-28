@@ -38,20 +38,23 @@ CLOUD_SERVICE_TYPE._metadata = CloudServiceTypeMeta.set_meta(
         EnumDyField.data_source('State', 'data.status', default_state={
             'safe': ['ACTIVE'],
             'available': ['BUILD', 'PAUSED'],
-            'warning': ['MIGRATING', 'HARD_REBOOT', 'PASSWORD', 'REBOOT', 'REBUILD', 'RESCUE', 'SHUTOFF', 'SUSPENDED'],
-            'disable': ['DELETED'],
+            'warning': ['MIGRATING', 'HARD_REBOOT', 'PASSWORD', 'REBOOT', 'REBUILD', 'RESCUE'],
+            'disable': ['DELETED', 'SUSPENDED', 'SHUTOFF'],
             'alert': ['ERROR']
         }),
         TextDyField.data_source('Flavor', 'data.flavor.name'),
         TextDyField.data_source('IP Address', 'data.minimal_addresses'),
         TextDyField.data_source('Key Name', 'data.key_name'),
         TextDyField.data_source('Availablity Zone', 'data.availability_zone'),
-        ListDyField.data_source('Volumes', 'data.attached_volumes'),
         ListDyField.data_source('Security Groups', 'data.security_groups'),
-        DateTimeDyField.data_source('Created', 'data.created_at')
+        ListDyField.data_source('Volumes', 'data.volumes.id', reference={"resource_type": "inventory.CloudService",
+                                                                         "reference_key": "reference.resource_id"}),
+        DateTimeDyField.data_source('Created', 'data.created_at'),
+        DateTimeDyField.data_source('Updated', 'data.updated_at', options={'is_optional': True})
     ],
     search=[
         SearchField.set(name='ID', key='data.id'),
+        SearchField.set(name='IP Address', key='data.minimal_addresses'),
         SearchField.set(name='Name', key='data.name'),
         SearchField.set(name='Flavor', key='data.flavor.name', data_type='string'),
         SearchField.set(name='State', key='data.status',
