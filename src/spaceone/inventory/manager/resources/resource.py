@@ -37,18 +37,22 @@ class BaseResource(object):
     _resource: str = ""
     _cloud_service_type_resource: Optional[CloudServiceTypeResource] = None
     _cloud_service_meta: Optional[CloudServiceMeta] = None
-    _project_resource: str = ""
+    _resource_path: Optional[str] = None
     _dashboard_url: Optional[str] = None
-    _collaboration_resources: List['BaseResource'] = []
+    _associated_resource_cls_list: List['BaseResource'] = []
+    _associated_resource_list: List[Tuple[ResourceModel, 'BaseResource']] = []
 
     def __init__(self, conn: Connection, **kwargs):
         self._conn = conn
         self._dashboard_url = None
-        self._external_link = ""
 
         if kwargs.get('secret_data'):
             if 'dashboard_url' in kwargs.get('secret_data'):
                 self._dashboard_url = kwargs.get('secret_data').get('dashboard_url')
+
+    @property
+    def resource_name(self) -> str:
+        return self._resource
 
     @property
     def cloud_service_meta(self) -> CloudServiceMeta:
@@ -67,12 +71,12 @@ class BaseResource(object):
         return self._cloud_service_type_resource.group
 
     @property
-    def external_link(self) -> str:
+    def external_url(self) -> str:
 
         if self._dashboard_url is None:
             return None
 
-        return urljoin(self._dashboard_url, self._project_resource)
+        return urljoin(base=self._dashboard_url, url=self._resource_path)
 
     @property
     def resources(self) -> List[Any]:
@@ -90,13 +94,18 @@ class BaseResource(object):
 
     @staticmethod
     def _set_obj_key_value(obj: Any, key: str, value: Any) -> None:
-
         setattr(obj, key, value)
 
+    # for sub class custom values
     def _set_default_model_obj_values(self, model_obj: Any, resource: Any):
         pass
 
-    def _set_default_model_obj_reference(self, model_obj: Any, resource: Any):
+    def __set_default_model_obj_region(self, model_obj: Any, resource: Any):
+
+        if hasattr(resource, 'location') and hasattr(resource.location, 'region_name'):
+            self._set_obj_key_value(model_obj, 'region_name', resource.location.region_name)
+
+    def __set_default_model_obj_links(self, model_obj: Any, resource: Any):
 
         if hasattr(resource, 'links'):
 
@@ -109,12 +118,28 @@ class BaseResource(object):
                 if link['rel'] == 'bookmark':
                     dic['bookmark_link'] = link['href']
 
-                if self.external_link is not None:
-                    dic['external_link'] = urljoin(self.external_link, resource.id)
-
             self._set_obj_key_value(model_obj, 'reference', ReferenceModel(dic))
 
-    def _create_obj(self, model_cls: ResourceModel, resource: Resource) -> (ResourceModel, Resource):
+        if self.external_url and self._resource_path:
+            self._set_obj_key_value(model_obj, 'external_link', urljoin(base=self.external_url,
+                                                                        url=self._resource_path.format(id=resource.id)))
+
+    def get_resource_model_from_associated_resources(self, resource_name: str, resource_id: str) \
+            -> Optional[ResourceModel]:
+
+        for resource_model, resource in self._associated_resource_list:
+            if resource.resource_name == resource_name and resource_model.id == resource_id:
+                return resource_model
+
+        return None
+
+    def _collect_associated_resource(self):
+
+        for associated_resource_cls in self._associated_resource_cls_list:
+            for resource in associated_resource_cls(self._conn).collect():
+                self._associated_resource_list.append(resource)
+
+    def _create_obj(self, model_cls: ResourceModel, resource: Resource, **kwargs) -> (ResourceModel, Resource):
 
         model_obj = model_cls()
 
@@ -129,12 +154,15 @@ class BaseResource(object):
                     setattr(model_obj, key, value)
 
         self._set_default_model_obj_values(model_obj, resource)
-        self._set_default_model_obj_reference(model_obj, resource)
+        self.__set_default_model_obj_links(model_obj, resource)
+        self.__set_default_model_obj_region(model_obj, resource)
 
         return model_obj
 
     def collect(self, **kwargs) -> Iterator[Tuple[ResourceModel, 'BaseResource']]:
 
+        if kwargs.get('collect_associated_resource'):
+            self._collect_associated_resource()
+
         for resource in self.resources:
-            _LOGGER.debug(resource.to_dict())
             yield self._create_obj(self._model_cls, resource), self

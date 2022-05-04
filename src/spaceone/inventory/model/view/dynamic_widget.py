@@ -95,7 +95,7 @@ class BaseDynamicWidget(Model):
     query = ModelType(BaseDynamicWidgetQuery, serialize_when_none=False)
 
     @classmethod
-    def set(cls, cloud_service_group, cloud_service_type, name, query, options={}):
+    def set(cls, cloud_service_group, cloud_service_type, provider, name, query, options={}):
         # Query : aggregate
         query_aggrs = []
         for _aggregate in query.get('aggregate', []):
@@ -155,7 +155,7 @@ class BaseDynamicWidget(Model):
         query['aggregate'] = query_aggrs
 
         # Query : filter
-        filter = [{'key': 'provider', 'value': 'google_cloud', 'operator': 'eq'},
+        filter = [{'key': 'provider', 'value': provider, 'operator': 'eq'},
                   {'key': 'cloud_service_group', 'value': cloud_service_group, 'operator': 'eq'},
                   {'key': 'cloud_service_type', 'value': cloud_service_type, 'operator': 'eq'}]
 
