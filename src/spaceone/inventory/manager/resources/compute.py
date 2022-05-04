@@ -2,14 +2,20 @@ from spaceone.inventory.model.resources.compute import InstanceModel
 from spaceone.inventory.model.resources.compute import FlavorModel
 from spaceone.inventory.model.resources.block_storage import VolumeModel
 from spaceone.inventory.manager.resources.resource import BaseResource
+from spaceone.inventory.manager.resources.block_storage import VolumeResource
 from spaceone.inventory.manager.resources.metadata.cloud_service_type import compute as cst_compute
 from spaceone.inventory.manager.resources.metadata.cloud_service import compute as cs_compute
 from openstack.compute.v2.server import Server
+import logging
 
 from typing import (
     List,
+    Iterator,
+    Tuple,
     Dict
 )
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class InstanceResource(BaseResource):
@@ -18,17 +24,14 @@ class InstanceResource(BaseResource):
     _resource = 'servers'
     _cloud_service_type_resource = cst_compute.CLOUD_SERVICE_TYPE
     _cloud_service_meta = cs_compute.CLOUD_SERVICE_METADATA
-    _project_resource = "/project/instances/"
+    _resource_path = "/project/instances/{id}"
+    _associated_resource_cls_list = [VolumeResource]
 
     @property
     def resources(self) -> List[Server]:
         return super().resources
 
     def _set_default_model_obj_values(self, model_obj: InstanceModel, resource: Server):
-
-        ## insert custom data
-        if hasattr(resource, 'location') and hasattr(resource.location, 'region_name'):
-            self._set_obj_key_value(model_obj, 'region_name', resource.location.region_name)
 
         if hasattr(resource, 'security_groups') and getattr(resource, 'security_groups') is not None:
             security_groups = list(dic['name'] for dic in resource.security_groups)
@@ -39,7 +42,14 @@ class InstanceResource(BaseResource):
             attached_volumes = []
 
             for attached_id in attached_ids:
-                attached_volumes.append(VolumeModel({"id": attached_id}))
+                volume = self.get_resource_model_from_associated_resources('volumes', attached_id)
+                if volume:
+                    attached_volumes.append(volume)
+                    if volume.is_bootable and volume.get('volume_image_metadata'):
+                        self._set_obj_key_value(model_obj, 'image_name',
+                                                volume.get('volume_image_metadata').get('image_name'))
+                else:
+                    attached_volumes.append(VolumeModel({"id": attached_id}))
 
             self._set_obj_key_value(model_obj, 'volumes', attached_volumes)
 

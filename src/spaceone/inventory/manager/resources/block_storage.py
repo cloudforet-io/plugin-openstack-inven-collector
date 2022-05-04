@@ -17,7 +17,8 @@ class VolumeResource(BaseResource):
     _resource = 'volumes'
     _cloud_service_type_resource = cst_blockstorage.CLOUD_SERVICE_TYPE
     _cloud_service_meta = cs_blockstorage.CLOUD_SERVICE_METADATA
-    _external_link_url = "/project/volumes/"
+    _resource_path = "/project/volumes/{id}"
+    __giga_to_byte = 1024 * 1024 * 1024
 
     @property
     def resources(self) -> List[Volume]:
@@ -25,8 +26,10 @@ class VolumeResource(BaseResource):
 
     def _set_default_model_obj_values(self, model_obj: VolumeModel, resource: Volume):
 
-        if hasattr(resource, 'location') and hasattr(resource.location, 'region_name'):
-            self._set_obj_key_value(model_obj, 'region_name', resource.location.region_name)
-
         if hasattr(resource, 'attachments') and len(resource.attachments) > 1:
             self._set_obj_key_value(model_obj, 'multiattach', True)
+
+        if hasattr(resource, 'size'):
+
+            self._set_obj_key_value(model_obj, 'size_gb', resource.size)
+            self._set_obj_key_value(model_obj, 'size', resource.size * self.__giga_to_byte)

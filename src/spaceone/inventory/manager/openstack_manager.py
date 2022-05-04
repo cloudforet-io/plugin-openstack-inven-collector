@@ -131,14 +131,17 @@ class OpenstackManager(BaseManager):
         for resource_cls in self._resource_cls_list:
             resource_obj = resource_cls(self.conn, secret_data=kwargs.get('secret_data'))
 
-            if len(cloud_service_types) == 0 or resource_obj.cloud_service_type_name in cloud_service_types:
+            if len(cloud_service_types) == 1 and cloud_service_types[0] == '*':
+                self._resource_obj_list.append(resource_obj)
+                _LOGGER.debug(f"Resource Added : {resource_obj.cloud_service_type_name}")
+            elif len(cloud_service_types) == 0 or resource_obj.cloud_service_type_name in cloud_service_types:
                 self._resource_obj_list.append(resource_obj)
                 _LOGGER.debug(f"Resource Added : {resource_obj.cloud_service_type_name}")
 
     def _collect_objs_resources(self) -> Iterator[List[ResourceModel]]:
 
         for resource_obj in self._resource_obj_list:
-            yield resource_obj.collect()
+            yield resource_obj.collect(collect_associated_resource=True)
 
     def _create_cloud_service_responses(self, collected_resources: List[Tuple[ResourceModel, BaseResource]]) \
             -> Iterator[CloudServiceResponse]:
@@ -146,11 +149,16 @@ class OpenstackManager(BaseManager):
         for collected_resource_model, resource_obj in collected_resources:
 
             # resource_id must exist in reference
+            instance_size: str = None
             reference = CloudServiceReferenceModel({"resource_id": collected_resource_model.id})
 
-            if hasattr(collected_resource_model, 'reference') and \
-                    getattr(collected_resource_model, 'reference') is not None:
-                reference.external_link = collected_resource_model.reference.external_link
+            if hasattr(collected_resource_model, 'external_link') and \
+                    getattr(collected_resource_model, 'external_link'):
+                reference.external_link = collected_resource_model.external_link
+
+            if hasattr(collected_resource_model, 'size') and \
+                    getattr(collected_resource_model, 'size'):
+                instance_size = collected_resource_model.size
 
             resource = CloudServiceResource({'data': collected_resource_model,
                                              'account': self.project_id,
@@ -158,7 +166,8 @@ class OpenstackManager(BaseManager):
                                              'region_code': self.region_code,
                                              '_metadata': resource_obj.cloud_service_meta,
                                              'cloud_service_group': resource_obj.cloud_service_group_name,
-                                             'cloud_service_type': resource_obj.cloud_service_type_name})
+                                             'cloud_service_type': resource_obj.cloud_service_type_name,
+                                             'instance_size': instance_size})
 
             _LOGGER.debug(resource.to_primitive())
             yield CloudServiceResponse({'resource': resource})

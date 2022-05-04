@@ -38,7 +38,8 @@ setup(
         'openstacksdk'
     ],
     package_data={
-        'spaceone': ['inventory/manager/metadata/*.*']
+        'spaceone': ['inventory/manager/metadata/*.yml',
+                     'inventory/manager/resources/metadata/cloud_service_type/widget/*/*.yml' ]
     },
     zip_safe=False,
 )

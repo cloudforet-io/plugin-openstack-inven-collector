@@ -25,7 +25,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class RegionManager(BaseManager):
-    region_file_path = 'metadata/regions.yaml'
+    region_file_path = 'metadata/regions.yml'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
