@@ -1,0 +1,16 @@
+---
+provider: openstack
+cloud_service_group: Compute
+cloud_service_type: Instance
+name: Count by Flavor
+query:
+  aggregate:
+    - group:
+        keys:
+          - name: name
+            key: data.flavor.name
+        fields:
+          - name: value
+            operator: count
+options:
+  chart_type: DONUT
