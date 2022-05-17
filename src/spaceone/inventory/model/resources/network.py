@@ -1,5 +1,7 @@
+from schematics.types import ModelType, ListType, StringType, IntType, DateTimeType, BooleanType, DictType, \
+    IPAddressType
+
 from spaceone.inventory.model.resources.base import ResourceModel
-from schematics.types import ModelType, ListType, StringType, IntType, DateTimeType, BooleanType, FloatType, DictType, IPAddressType
 
 
 class NetworkModel(ResourceModel):
@@ -18,11 +20,11 @@ class NetworkModel(ResourceModel):
     is_shared = BooleanType()
     is_vlan_transparent = BooleanType(serialize_when_none=False)
     mtu = StringType()
-    project_id = StringType()
     segments = ListType(DictType(StringType), default=[])
     status = StringType()
     created_at = DateTimeType()
     updated_at = DateTimeType()
+    cidrs = ListType(StringType, default=[])
     subnets = ListType(ModelType('SubnetModel'), default=[])
     minimal_subnets = ListType(StringType(), default=[])
 
@@ -51,3 +53,5 @@ class SegmentModel(ResourceModel):
     network_type = StringType()
     physical_network = StringType()
     segmentation_id = IntType()
+
+

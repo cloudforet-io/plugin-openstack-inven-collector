@@ -1,8 +1,9 @@
+import logging
+
 from spaceone.api.inventory.plugin import collector_pb2_grpc, collector_pb2
 from spaceone.core.pygrpc import BaseAPI
-from spaceone.inventory.service import CollectorService
 
-import logging
+from spaceone.inventory.service import CollectorService
 
 _LOGGER = logging.getLogger(__name__)
 

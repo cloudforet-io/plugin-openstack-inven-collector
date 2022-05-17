@@ -1,7 +1,8 @@
 from schematics import Model
-from schematics.types import ListType, StringType, PolyModelType, DictType, ModelType, FloatType
+from schematics.types import StringType, ModelType
 
-from .base import BaseMetaData, BaseResponse, MetaDataView, MetaDataViewSubData, ReferenceModel
+from .base import BaseMetaData, MetaDataView, MetaDataViewSubData
+
 
 class Labels(Model):
     key = StringType()

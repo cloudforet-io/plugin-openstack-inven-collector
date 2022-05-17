@@ -1,7 +1,9 @@
 from schematics import Model
-from schematics.types import StringType, ListType, BooleanType, ModelType, PolyModelType, DictType
+from schematics.types import StringType, ListType, BooleanType, ModelType, PolyModelType
+
 from .dynamic_field import TextDyField, StateDyField, BadgeDyField, ListDyField, DictDyField, DateTimeDyField, \
     ImageDyField, EnumDyField, SizeField, ProgressField
+
 
 class BaseDynamicWidgetKeyFields(Model):
     key = StringType(serialize_when_none=False)

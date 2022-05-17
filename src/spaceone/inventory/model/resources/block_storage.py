@@ -1,20 +1,20 @@
+from schematics.types import ListType, StringType, IntType, DateTimeType, BooleanType, FloatType, DictType
+
 from spaceone.inventory.model.resources.base import ResourceModel
-from schematics.types import ModelType, ListType, StringType, IntType, DateTimeType, BooleanType, FloatType, DictType
+
 
 class VolumeModel(ResourceModel):
     id = StringType()
     image_id = StringType()
     name = StringType()
-    description =  StringType()
+    description = StringType()
     multiattach = BooleanType(default=False)
     size = FloatType(default=0)
     size_gb = IntType(default=0)
     volume_type = StringType()
-    description = StringType()
     availability_zone = StringType()
     is_bootable = BooleanType(default=None)
     is_encrypted = BooleanType(default=None)
-    project_id = StringType()
     snapshot_id = StringType()
     source_volume_id = StringType()
     host = StringType()

@@ -1,5 +1,6 @@
 from schematics import Model
-from schematics.types import ListType, StringType, PolyModelType, DictType, ModelType, BooleanType, DateTimeType, FloatType
+from schematics.types import StringType, ModelType, BooleanType
+
 
 class ReferenceModel(Model):
     class Option:
@@ -13,5 +14,19 @@ class ResourceModel(Model):
     reference = ModelType(ReferenceModel, serialize_when_none=False)
     external_link = StringType()
     region_name = StringType()
+    project_id = StringType(serialize_when_none=False)
+    project_name = StringType(serialize_when_none=False)
+
+class Secret(Model):
+    username = StringType(required=True)
+    password = StringType(required=True)
+    project_id = StringType(required=True)
+    user_domain_name = StringType(required=True)
+    region_name = StringType(required=True)
+    auth_url = StringType(required=True)
+    interface = StringType(default="public")
+    identity_api_version = StringType(default="3")
+    dashboard_url = StringType(default=None)
+    all_projects = BooleanType(default=False)
 
 

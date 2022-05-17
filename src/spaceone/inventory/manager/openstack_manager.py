@@ -1,24 +1,5 @@
-import time
 import logging
-import json
-import openstack
-import copy
-from spaceone.core.manager import BaseManager
-from spaceone.inventory.manager.resources.compute import InstanceResource
-from spaceone.inventory.manager.resources.compute import FlavorResource
-from spaceone.inventory.manager.resources.block_storage import VolumeResource
-from spaceone.inventory.manager.resources.network import NetworkResource
-from spaceone.inventory.manager.resources.resource import BaseResource
-from spaceone.inventory.model.common.response import CloudServiceResponse
-from spaceone.inventory.model.common.response import CloudServiceTypeResourceResponse
-from spaceone.inventory.model.common.base import CloudServiceResource
-from spaceone.inventory.model.common.base import CloudServiceReferenceModel
-from spaceone.inventory.model.resources.base import ResourceModel
-from openstack.connection import Connection
-from spaceone.inventory.error.base import CollectorError
-
 from typing import (
-
     List,
     Dict,
     Optional,
@@ -28,15 +9,28 @@ from typing import (
     Iterator
 )
 
+import openstack
+import json
+from openstack.connection import Connection
+from spaceone.core.manager import BaseManager
+from spaceone.inventory.manager import resources
+from spaceone.inventory.model.common.base import CloudServiceReferenceModel
+from spaceone.inventory.model.common.base import CloudServiceResource
+from spaceone.inventory.model.common.response import CloudServiceResponse
+from spaceone.inventory.model.common.response import CloudServiceTypeResourceResponse
+from spaceone.inventory.model.resources.base import ResourceModel
+from spaceone.inventory.model.resources.base import Secret
+from spaceone.inventory.error.base import CollectorError
+
 _LOGGER = logging.getLogger(__name__)
 
 __all__ = ['OpenstackManager']
 
 
 class OpenstackManager(BaseManager):
-    _resource_cls_list: List[Callable[[Optional[Connection]], 'BaseResource']] = [InstanceResource, VolumeResource,
-                                                                                  NetworkResource]
-    _resource_obj_list: List[BaseResource] = []
+
+    _resource_cls_list: List[Callable[[Optional[Connection]], 'BaseResource']] = []
+    _resource_obj_list: List['BaseResource'] = []
     _secret_data: Dict = {}
     _options: Dict = {}
     __conn: Optional[Connection] = None
@@ -44,6 +38,7 @@ class OpenstackManager(BaseManager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._resource_obj_list = []
+        self._resource_cls_list = []
         self._secret_data = {}
         self._options = {}
         self.__conn = None
@@ -68,6 +63,13 @@ class OpenstackManager(BaseManager):
     def region_code(self) -> str:
         return self._secret_data.get('region_name')
 
+    def _set_resource_cls(self) -> None:
+
+        for class_name, module_name in resources.OS_RESOURCE_MAP.items():
+            mod = __import__(module_name, fromlist=[module_name])
+            cls = getattr(mod, class_name)
+            self._resource_cls_list.append(cls)
+
     def _set_connection(self, secret_data: Optional[Dict] = {}) -> None:
 
         # Initialize and turn on debug logging
@@ -79,40 +81,22 @@ class OpenstackManager(BaseManager):
 
         try:
 
-            required_keys = ['username', 'password', 'user_domain_name', 'auth_url', 'project_id',
-                             'identity_api_version', 'interface', 'region_name']
+            self._secret_data = Secret(secret_data)
+            self._secret_data.validate()
 
-            for key in required_keys:
-                if key not in secret_data.keys() or not (secret_data[key] and secret_data[key].strip()):
-                    raise CollectorError(message=f"Invalid input for field {required_keys}")
-
-            username = secret_data.get('username')
-            password = secret_data.get('password')
-            user_domain_name = secret_data.get('user_domain_name')
-            auth_url = secret_data.get('auth_url')
-            project_id = secret_data.get('project_id')
-            identity_api_version = secret_data.get('identity_api_version')
-            interface = secret_data.get('interface')
-            region_name = secret_data.get('region_name')  # This is used as region_code
-
-            # Initialize connection
-            self._secret_data = copy.deepcopy(secret_data)
             self.conn = openstack.connection.Connection(
-                region_name=region_name,
+                region_name=self._secret_data.region_name,
                 auth=dict(
-                    auth_url=auth_url,
-                    username=username,
-                    password=password,
-                    project_id=project_id,
-                    user_domain_name=user_domain_name),
-                identity_api_version=identity_api_version,
-                interface=interface)
+                    auth_url=self._secret_data.auth_url,
+                    username=self._secret_data.username,
+                    password=self._secret_data.password,
+                    project_id=self._secret_data.project_id,
+                    user_domain_name=self._secret_data.user_domain_name),
+                identity_api_version=self._secret_data.identity_api_version,
+                interface=self._secret_data.interface)
 
         except Exception as e:
             raise CollectorError(message='Creating openstack connection failed', cause=e)
-
-    def _set_options(self, options: Dict = None) -> None:
-        self._options = copy.deepcopy(options)
 
     def _create_resource_objs(self, **kwargs) -> None:
 
@@ -124,32 +108,50 @@ class OpenstackManager(BaseManager):
             if isinstance(options.get('cloud_service_types'), list):
                 cloud_service_types = options.get('cloud_service_types')
 
-        _LOGGER.debug(f"Collect target cloud service types : {cloud_service_types}")
+        _LOGGER.info(f"Collect target cloud service types : {cloud_service_types}")
 
         # Add resources object type for collecting
-        _LOGGER.debug(f"Total resource class list : {self._resource_cls_list}")
+        self._set_resource_cls()
+
+        _LOGGER.info(f"Total resource class list : {self._resource_cls_list}")
+
+        dic = {}
+
+        if kwargs.get('secret_data'):
+            if 'all_projects' in kwargs.get('secret_data'):
+                dic['all_projects'] = json.loads(kwargs.get('secret_data').get('all_projects').lower())
+
+            # for dev test
+            #dic['all_projects'] = True
+
+            if 'dashboard_url' in kwargs.get('secret_data'):
+                dic['dashboard_url'] = kwargs.get('secret_data').get('dashboard_url')
+
         for resource_cls in self._resource_cls_list:
-            resource_obj = resource_cls(self.conn, secret_data=kwargs.get('secret_data'))
+            resource_obj = resource_cls(self.conn, **dic)
 
             if len(cloud_service_types) == 1 and cloud_service_types[0] == '*':
                 self._resource_obj_list.append(resource_obj)
-                _LOGGER.debug(f"Resource Added : {resource_obj.cloud_service_type_name}")
             elif len(cloud_service_types) == 0 or resource_obj.cloud_service_type_name in cloud_service_types:
                 self._resource_obj_list.append(resource_obj)
-                _LOGGER.debug(f"Resource Added : {resource_obj.cloud_service_type_name}")
+
+            if resource_obj:
+                _LOGGER.info(f"Resource Added : {resource_obj.cloud_service_type_name}")
 
     def _collect_objs_resources(self) -> Iterator[List[ResourceModel]]:
 
         for resource_obj in self._resource_obj_list:
             yield resource_obj.collect(collect_associated_resource=True)
 
-    def _create_cloud_service_responses(self, collected_resources: List[Tuple[ResourceModel, BaseResource]]) \
+    def _create_cloud_service_responses(self, collected_resources: List[Tuple[ResourceModel, 'BaseResource']]) \
             -> Iterator[CloudServiceResponse]:
 
         for collected_resource_model, resource_obj in collected_resources:
 
             # resource_id must exist in reference
             instance_size: str = None
+            name: str = None
+            project_id: str = None
             reference = CloudServiceReferenceModel({"resource_id": collected_resource_model.id})
 
             if hasattr(collected_resource_model, 'external_link') and \
@@ -160,8 +162,17 @@ class OpenstackManager(BaseManager):
                     getattr(collected_resource_model, 'size'):
                 instance_size = collected_resource_model.size
 
+            if hasattr(collected_resource_model, 'name') and \
+                    getattr(collected_resource_model, 'name'):
+                name = collected_resource_model.name
+
+            if hasattr(collected_resource_model, 'project_id') and \
+                    getattr(collected_resource_model, 'project_id'):
+                project_id = collected_resource_model.project_id
+
             resource = CloudServiceResource({'data': collected_resource_model,
-                                             'account': self.project_id,
+                                             'name': name,
+                                             'account': project_id,
                                              'reference': reference,
                                              'region_code': self.region_code,
                                              '_metadata': resource_obj.cloud_service_meta,
@@ -171,11 +182,6 @@ class OpenstackManager(BaseManager):
 
             _LOGGER.debug(resource.to_primitive())
             yield CloudServiceResponse({'resource': resource})
-
-    def _create_cloud_service_type_response(self, resource_obj: BaseResource) -> CloudServiceTypeResourceResponse:
-        cst_response = CloudServiceTypeResourceResponse({"resource": resource_obj.cloud_service_type_resource})
-        _LOGGER.debug(cst_response.to_primitive())
-        return cst_response
 
     def collect_resources(self, params: Dict) -> Union[Iterator[CloudServiceResponse],
                                                        Iterator[CloudServiceTypeResourceResponse]]:
@@ -188,7 +194,9 @@ class OpenstackManager(BaseManager):
         self._create_resource_objs(secret_data=params.get('secret_data'), options=params.get('options'))
 
         for resource_obj in self._resource_obj_list:
-            cloud_svc_type_response = self._create_cloud_service_type_response(resource_obj)
+            cloud_svc_type_response =\
+                CloudServiceTypeResourceResponse({"resource": resource_obj.cloud_service_type_resource})
+            _LOGGER.debug(cloud_svc_type_response.to_primitive())
             yield cloud_svc_type_response
 
         for collected_obj_resources in self._collect_objs_resources():

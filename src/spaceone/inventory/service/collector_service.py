@@ -1,24 +1,18 @@
-import time
-import logging
-import json
 import concurrent.futures
-
-from spaceone.core.service import *
-from spaceone.inventory.conf.cloud_service_conf import *
-from spaceone.inventory.model.common.response import ErrorResourceResponse
-from spaceone.inventory import manager
-
-
+import json
+import logging
+import time
 from typing import (
 
     List,
-    Dict,
-    Optional,
-    Union,
-    Tuple,
-    Callable,
-    Iterator
+    Dict
 )
+
+from spaceone.core.service import *
+
+from spaceone.inventory import manager
+from spaceone.inventory.conf.cloud_service_conf import *
+from spaceone.inventory.model.common.response import ErrorResourceResponse
 
 __all__ = ['CollectorService']
 

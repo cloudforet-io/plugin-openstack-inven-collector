@@ -1,5 +1,6 @@
 from schematics import Model
 from schematics.types import StringType, PolyModelType, ListType
+
 from spaceone.inventory.model.view.dynamic_field import BaseDynamicField, TextDyField
 
 
