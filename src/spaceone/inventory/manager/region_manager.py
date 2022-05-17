@@ -1,25 +1,16 @@
+import logging
+import os
+from typing import (
+    Iterator,
+    Dict,
+)
+
 from spaceone.core.manager import BaseManager
+
+from spaceone.inventory.error.base import CollectorError
+from spaceone.inventory.libs import common_parser
 from spaceone.inventory.model.common.region import RegionModel
 from spaceone.inventory.model.common.response import RegionResponse
-from spaceone.inventory.libs import common_parser
-from spaceone.inventory.error.base import CollectorError
-
-import json
-import os
-import yaml
-import errno
-import logging
-
-from typing import (
-    Any,
-    Iterator,
-    List,
-    Dict,
-    Optional,
-    Type,
-    Union,
-    Tuple,
-)
 
 _LOGGER = logging.getLogger(__name__)
 

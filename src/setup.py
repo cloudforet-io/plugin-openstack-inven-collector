@@ -39,7 +39,8 @@ setup(
     ],
     package_data={
         'spaceone': ['inventory/manager/metadata/*.yml',
-                     'inventory/manager/resources/metadata/cloud_service_type/widget/*/*.yml' ]
+                     'inventory/manager/resources/metadata/cloud_service_type/widget/*/*.yml',
+                     'inventory/manager/external_sdk/openstack/*/*/*.py']
     },
     zip_safe=False,
 )

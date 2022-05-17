@@ -1,0 +1,16 @@
+---
+provider: openstack
+cloud_service_group: Storage
+cloud_service_type: Share
+name: Count by Type
+query:
+  aggregate:
+    - group:
+        keys:
+          - name: name
+            key: data.share_type
+        fields:
+          - name: value
+            operator: count
+options:
+  chart_type: DONUT

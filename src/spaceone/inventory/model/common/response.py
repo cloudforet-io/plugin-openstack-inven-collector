@@ -1,9 +1,10 @@
 from schematics import Model
-from spaceone.inventory.model.common.region import RegionModel
-from spaceone.inventory.model.common.base import ErrorResource
-from spaceone.inventory.model.common.base import CloudServiceTypeResource
-from spaceone.inventory.model.common.base import CloudServiceResource
 from schematics.types import ListType, StringType, PolyModelType, DictType, ModelType
+
+from spaceone.inventory.model.common.base import CloudServiceResource
+from spaceone.inventory.model.common.base import CloudServiceTypeResource
+from spaceone.inventory.model.common.base import ErrorResource
+from spaceone.inventory.model.common.region import RegionModel
 
 
 class BaseResponse(Model):

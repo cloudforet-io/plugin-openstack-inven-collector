@@ -1,7 +1,8 @@
 from schematics import Model
+from schematics.types import ListType, StringType, PolyModelType, DictType, ModelType, FloatType, BooleanType
+
 from spaceone.inventory.model.view.cloud_service import CloudServiceMeta
 from spaceone.inventory.model.view.cloud_service_type import CloudServiceTypeMeta
-from schematics.types import ListType, StringType, PolyModelType, DictType, ModelType, FloatType, BooleanType
 
 
 class Labels(Model):

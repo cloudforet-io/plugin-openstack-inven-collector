@@ -1,8 +1,9 @@
 import math
+
 from schematics import Model
 from schematics.types import ModelType, StringType, PolyModelType, DictType, BooleanType
-from spaceone.inventory.model.view.dynamic_search import BaseDynamicSearch
 
+from spaceone.inventory.model.view.dynamic_search import BaseDynamicSearch
 
 BACKGROUND_COLORS = [
     'black', 'white',

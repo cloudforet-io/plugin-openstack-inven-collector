@@ -1,12 +1,13 @@
-import logging
 import json
+import logging
 import os
-import yaml
-from spaceone.inventory.error.base import CollectorError
-
 from typing import (
     Dict,
 )
+
+import yaml
+
+from spaceone.inventory.error.base import CollectorError
 
 _LOGGER = logging.getLogger(__name__)
 

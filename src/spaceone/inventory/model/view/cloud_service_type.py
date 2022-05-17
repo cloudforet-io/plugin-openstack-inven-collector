@@ -1,7 +1,5 @@
-from schematics import Model
-from schematics.types import ListType, StringType, PolyModelType, DictType, BooleanType
 from spaceone.inventory.model.view.dynamic_layout import QuerySearchTableDynamicLayout
-from .base import BaseMetaData, BaseResponse, MetaDataViewTable, MetaDataView
+from .base import BaseMetaData, MetaDataViewTable, MetaDataView
 
 
 class CloudServiceTypeMeta(BaseMetaData):
