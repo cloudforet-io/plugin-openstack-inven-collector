@@ -12,6 +12,7 @@ class SecurityGroupModel(ResourceModel):
     updated_at = DateTimeType()
     security_group_rules = ListType(ModelType('SecurityGroupRuleModel'), default=[])
 
+
 class SecurityGroupRuleModel(ResourceModel):
     id = StringType()
     security_group_name = StringType()

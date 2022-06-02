@@ -1,0 +1,23 @@
+---
+provider: openstack
+cloud_service_group: Storage
+cloud_service_type: Storage
+name: Allocated Volume Size by Backend
+query:
+  aggregate:
+    - group:
+        keys:
+          - name: name
+            key: data.volume_backend_name
+        fields:
+          - name: value
+            key: data.total_allocated_volume_size
+            operator: sum
+options:
+  chart_type: TREEMAP
+  value_options:
+    key: value
+    type: size
+    options:
+      default: 0
+      source_unit: GB

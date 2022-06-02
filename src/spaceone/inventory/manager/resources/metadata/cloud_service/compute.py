@@ -8,8 +8,8 @@ from spaceone.inventory.model.view.dynamic_layout import ItemDynamicLayout, Simp
 
 CS_INSTANCE_META = CSTMetaGenerator(CST_INSTANCE_META)
 
-CS_INSTANCE_META.delete_cst_meta_field('Volumes')  # to show on VOLUMES tab instead of Instance
 CS_INSTANCE_META.insert_cst_meta_field('ID', TextDyField, 'Description', 'data.description')
+CS_INSTANCE_META.append_cst_meta_field(TextDyField, 'Metadata', 'data.metadata')
 CS_INSTANCE_META.append_cst_meta_field(TextDyField, 'selfLink', 'data.reference.self_link')
 CS_INSTANCE_META.append_cst_meta_field(TextDyField, 'bookmarkLink', 'data.reference.bookmark_link')
 CS_INSTANCE_META.append_cst_meta_field(TextDyField, 'externalLink', 'data.external_link')

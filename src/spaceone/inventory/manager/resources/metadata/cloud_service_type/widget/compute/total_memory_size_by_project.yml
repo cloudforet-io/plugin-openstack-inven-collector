@@ -1,0 +1,22 @@
+---
+provider: openstack
+cloud_service_group: Compute
+cloud_service_type: Instance
+name: Total Memory by Project
+query:
+  aggregate:
+    - group:
+        keys:
+          - name: name
+            key: data.project_name
+        fields:
+          - name: value
+            key: data.flavor.ram
+            operator: sum
+options:
+  chart_type: DONUT
+  value_options:
+    key: value
+    type: size
+    options:
+      source_unit: MB

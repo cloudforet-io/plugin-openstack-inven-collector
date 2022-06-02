@@ -1,18 +1,18 @@
-import logging
+
 import os
 from typing import (
     Iterator,
     Dict,
 )
 
+from spaceone.inventory.conf.global_conf import get_logger
 from spaceone.core.manager import BaseManager
-
 from spaceone.inventory.error.base import CollectorError
 from spaceone.inventory.libs import common_parser
 from spaceone.inventory.model.common.region import RegionModel
 from spaceone.inventory.model.common.response import RegionResponse
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = get_logger(__name__)
 
 
 class RegionManager(BaseManager):

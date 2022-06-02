@@ -8,7 +8,7 @@ query:
     - group:
         keys:
           - name: name
-            key: account
+            key: data.project_name
         fields:
           - name: value
             operator: count

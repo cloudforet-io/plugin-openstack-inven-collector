@@ -2,7 +2,7 @@
 provider: openstack
 cloud_service_group: Compute
 cloud_service_type: Hypervisor
-name: Total vCpu
+name: Total vCPUs
 query:
   aggregate:
     - group:

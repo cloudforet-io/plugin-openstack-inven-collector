@@ -1,23 +1,28 @@
-import logging
+from spaceone.inventory.conf.global_conf import get_logger
+
 from openstack.network.v2.network import Network
 
 from spaceone.inventory.manager.resources.metadata.cloud_service import network as cs
 from spaceone.inventory.manager.resources.metadata.cloud_service_type import network as cst
+from spaceone.inventory.manager.resources.metadata.cloud_service import subnet as cs_subnet
+from spaceone.inventory.manager.resources.metadata.cloud_service_type import subnet as cst_subnet
 from spaceone.inventory.manager.resources.resource import BaseResource
 from spaceone.inventory.model.resources.network import NetworkModel
 from spaceone.inventory.model.resources.network import SegmentModel
 from spaceone.inventory.model.resources.network import SubnetModel
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = get_logger(__name__)
+
 
 class SubnetResource(BaseResource):
     _model_cls = SubnetModel
     _proxy = 'network'
     _resource = 'subnets'
-    _resource_path = "/project/networks/subnets/"
+    _resource_path = "/auth/switch/{project_id}/?next=/project/networks/{id}/detai"
     _native_all_projects_query_support = False
     _native_project_id_query_support = True
-
+    _cloud_service_type_resource = cst_subnet.CLOUD_SERVICE_TYPE
+    _cloud_service_meta = cs_subnet.CLOUD_SERVICE_METADATA
 
 class NetworkResource(BaseResource):
     _model_cls = NetworkModel
@@ -39,11 +44,11 @@ class NetworkResource(BaseResource):
             cidrs = []
 
             for subnet_id in subnet_ids:
-                subnet = self.get_resource_model_from_associated_resource('subnets', id=subnet_id,
+                subnet = self.get_resource_model_from_associated_resource('SubnetResource', id=subnet_id,
                                                                           project_id=resource.project_id)
                 if subnet:
                     subnets.append(subnet)
-                    minimal_subnets.append(f"{subnet.name} : {subnet.cidr} -> GW {subnet.gateway_ip}")
+                    minimal_subnets.append(f"{subnet.name}: {subnet.cidr}, GW: {subnet.gateway_ip}")
                     cidrs.append(subnet.cidr)
                 else:
                     subnets.append(SubnetModel({"id": subnet_id}))

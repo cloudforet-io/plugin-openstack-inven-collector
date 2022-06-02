@@ -2,7 +2,7 @@ from spaceone.inventory.manager.resources.metadata.cloud_service_type.network im
 from spaceone.inventory.manager.resources.metadata.metaman import CSTMetaGenerator
 from spaceone.inventory.model.view.cloud_service import CloudServiceMeta
 from spaceone.inventory.model.view.dynamic_field import TextDyField, ListDyField, DateTimeDyField, \
-    EnumDyField
+    EnumDyField, BadgeDyField
 from spaceone.inventory.model.view.dynamic_layout import ItemDynamicLayout, TableDynamicLayout, SimpleTableDynamicLayout
 
 CST_NETWORK_META.insert_cst_meta_field('ID', TextDyField, 'Description', 'data.description')
@@ -13,7 +13,10 @@ CLOUD_SERVICE_BASE = ItemDynamicLayout.set_fields('Network', fields=CST_NETWORK_
 CS_NETWORK_SUBNET_META = CSTMetaGenerator()
 
 CS_NETWORK_SUBNET_META.append_cst_meta_field(TextDyField, 'Name', 'name')
-CS_NETWORK_SUBNET_META.append_cst_meta_field(TextDyField, 'ID', 'id')
+CS_NETWORK_SUBNET_META.append_cst_meta_field(BadgeDyField, 'ID', 'id',
+                                             reference={"resource_type": "inventory.CloudService",
+                                                        "reference_key": "reference.resource_id"}, )
+CS_NETWORK_SUBNET_META.append_cst_meta_field(TextDyField, 'Description', 'description')
 CS_NETWORK_SUBNET_META.append_cst_meta_field(EnumDyField, 'IP Version', 'ip_version',
                                              default_badge={'coral.600': ['4'], 'indigo.500': ['6']})
 CS_NETWORK_SUBNET_META.append_cst_meta_field(EnumDyField, 'DHCP', 'is_dhcp_enabled',
@@ -24,9 +27,8 @@ CS_NETWORK_SUBNET_META.append_cst_meta_field(TextDyField, 'G/W', 'gateway_ip')
 CS_NETWORK_SUBNET_META.append_cst_meta_field(ListDyField, 'Routes', 'host_routes')
 CS_NETWORK_SUBNET_META.append_cst_meta_field(ListDyField, 'DNS', 'dns_nameservers')
 CS_NETWORK_SUBNET_META.append_cst_meta_field(TextDyField, 'Segment ID', 'segment_id')
-CS_NETWORK_SUBNET_META.append_cst_meta_field(TextDyField, 'Description', 'description')
-CS_NETWORK_SUBNET_META.append_cst_meta_field(DateTimeDyField, 'Created', 'created_at', auto_search=True)
-CS_NETWORK_SUBNET_META.append_cst_meta_field(DateTimeDyField, 'Updated', 'updated_at', auto_search=True)
+CS_NETWORK_SUBNET_META.append_cst_meta_field(DateTimeDyField, 'Created', 'created_at')
+CS_NETWORK_SUBNET_META.append_cst_meta_field(DateTimeDyField, 'Updated', 'updated_at')
 
 CLOUD_SERVICE_SUBNET = TableDynamicLayout.set_fields('Subnets', root_path="data.subnets",
                                                      fields=CS_NETWORK_SUBNET_META.fields)

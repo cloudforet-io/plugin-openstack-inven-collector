@@ -1,4 +1,4 @@
 spaceone-core
 spaceone-api
-openstacksdk
+openstacksdk==0.99.0
 schematics

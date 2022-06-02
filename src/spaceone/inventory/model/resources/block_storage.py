@@ -19,7 +19,22 @@ class VolumeModel(ResourceModel):
     source_volume_id = StringType()
     host = StringType()
     status = StringType()
+    metadata = DictType(StringType, default={})
     attachments = ListType(StringType, default=[])
     volume_image_metadata = DictType(StringType, serialize_when_none=False)
     created_at = DateTimeType()
     launched_at = DateTimeType()
+
+
+class VolumeQuotaModel(ResourceModel):
+
+    quota_type = StringType(default="Volume")
+    backup_gigabyte = FloatType()
+    backups = IntType()
+    gigabytes = FloatType()
+    groups = IntType()
+    per_volume_gigabytes = FloatType()
+    snapshots = IntType()
+    volumes = IntType()
+    usage = DictType(StringType, serialize_when_none=False)
+    reservation = DictType(StringType, serialize_when_none=False)

@@ -1,0 +1,17 @@
+---
+provider: openstack
+cloud_service_group: Compute
+cloud_service_type: Hypervisor
+name: Used vCPUs
+query:
+  aggregate:
+    - group:
+        fields:
+          - name: value
+            key: data.vcpus_used
+            operator: sum
+options:
+  value_options:
+    key: value
+    options:
+      default: 0

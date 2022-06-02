@@ -1,4 +1,6 @@
-import logging
+import openstack
+import json
+
 from typing import (
     List,
     Dict,
@@ -9,8 +11,8 @@ from typing import (
     Iterator
 )
 
-import openstack
-import json
+from spaceone.inventory.conf.global_conf import get_logger
+
 from openstack.connection import Connection
 from spaceone.core.manager import BaseManager
 from spaceone.inventory.manager import resources
@@ -22,7 +24,7 @@ from spaceone.inventory.model.resources.base import ResourceModel
 from spaceone.inventory.model.resources.base import Secret
 from spaceone.inventory.error.base import CollectorError
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = get_logger(__name__)
 
 __all__ = ['OpenstackManager']
 
@@ -66,6 +68,10 @@ class OpenstackManager(BaseManager):
     def _set_resource_cls(self) -> None:
 
         for class_name, module_name in resources.OS_RESOURCE_MAP.items():
+
+            if class_name in resources.IGNORE_RESOURCE_LIST:
+                continue
+
             mod = __import__(module_name, fromlist=[module_name])
             cls = getattr(mod, class_name)
             self._resource_cls_list.append(cls)
@@ -121,22 +127,23 @@ class OpenstackManager(BaseManager):
             if 'all_projects' in kwargs.get('secret_data'):
                 dic['all_projects'] = json.loads(kwargs.get('secret_data').get('all_projects').lower())
 
-            # for dev test
-            #dic['all_projects'] = True
-
             if 'dashboard_url' in kwargs.get('secret_data'):
                 dic['dashboard_url'] = kwargs.get('secret_data').get('dashboard_url')
+
+            if 'project_id' in kwargs.get('secret_data'):
+                dic['default_project_id'] = kwargs.get('secret_data').get('project_id')
 
         for resource_cls in self._resource_cls_list:
             resource_obj = resource_cls(self.conn, **dic)
 
+            ## The '*' or [] can call all openstack resources
             if len(cloud_service_types) == 1 and cloud_service_types[0] == '*':
                 self._resource_obj_list.append(resource_obj)
             elif len(cloud_service_types) == 0 or resource_obj.cloud_service_type_name in cloud_service_types:
                 self._resource_obj_list.append(resource_obj)
 
             if resource_obj:
-                _LOGGER.info(f"Resource Added : {resource_obj.cloud_service_type_name}")
+                _LOGGER.info(f"Cloud service type added : {resource_obj.cloud_service_type_name}")
 
     def _collect_objs_resources(self) -> Iterator[List[ResourceModel]]:
 
@@ -196,7 +203,10 @@ class OpenstackManager(BaseManager):
         for resource_obj in self._resource_obj_list:
             cloud_svc_type_response =\
                 CloudServiceTypeResourceResponse({"resource": resource_obj.cloud_service_type_resource})
-            _LOGGER.debug(cloud_svc_type_response.to_primitive())
+
+            if cloud_svc_type_response:
+                _LOGGER.debug(cloud_svc_type_response.to_primitive())
+
             yield cloud_svc_type_response
 
         for collected_obj_resources in self._collect_objs_resources():

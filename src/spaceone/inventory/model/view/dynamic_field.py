@@ -9,13 +9,19 @@ BACKGROUND_COLORS = [
     'black', 'white',
     'gray', 'gray.100', 'gray.200', 'gray.300', 'gray.400', 'gray.500', 'gray.600', 'gray.700', 'gray.800', 'gray.900',
     'red', 'red.100', 'red.200', 'red.300', 'red.400', 'red.500', 'red.600', 'red.700', 'red.800', 'red.900',
-    'coral', 'coral.100', 'coral.200', 'coral.300', 'coral.400', 'coral.500', 'coral.600', 'coral.700', 'coral.800', 'coral.900',
-    'yellow', 'yellow.100', 'yellow.200', 'yellow.300', 'yellow.400', 'yellow.500', 'yellow.600', 'yellow.700', 'yellow.800', 'yellow.900',
-    'green', 'green.100', 'green.200', 'green.300', 'green.400', 'green.500', 'green.600', 'green.700', 'green.800', 'green.900',
+    'coral', 'coral.100', 'coral.200', 'coral.300', 'coral.400', 'coral.500', 'coral.600', 'coral.700', 'coral.800',
+    'coral.900',
+    'yellow', 'yellow.100', 'yellow.200', 'yellow.300', 'yellow.400', 'yellow.500', 'yellow.600', 'yellow.700',
+    'yellow.800', 'yellow.900',
+    'green', 'green.100', 'green.200', 'green.300', 'green.400', 'green.500', 'green.600', 'green.700', 'green.800',
+    'green.900',
     'blue', 'blue.100', 'blue.200', 'blue.300', 'blue.400', 'blue.500', 'blue.600', 'blue.700', 'blue.800', 'blue.900',
-    'violet', 'violet.100', 'violet.200', 'violet.300', 'violet.400', 'violet.500', 'violet.600', 'violet.700', 'violet.800', 'violet.900',
-    'peacock', 'peacock.100', 'peacock.200', 'peacock.300', 'peacock.400', 'peacock.500', 'peacock.600', 'peacock.700', 'peacock.800', 'peacock.900',
-    'indigo', 'indigo.100', 'indigo.200', 'indigo.300', 'indigo.400', 'indigo.500', 'indigo.600', 'indigo.700', 'indigo.800', 'indigo.900',
+    'violet', 'violet.100', 'violet.200', 'violet.300', 'violet.400', 'violet.500', 'violet.600', 'violet.700',
+    'violet.800', 'violet.900',
+    'peacock', 'peacock.100', 'peacock.200', 'peacock.300', 'peacock.400', 'peacock.500', 'peacock.600', 'peacock.700',
+    'peacock.800', 'peacock.900',
+    'indigo', 'indigo.100', 'indigo.200', 'indigo.300', 'indigo.400', 'indigo.500', 'indigo.600', 'indigo.700',
+    'indigo.800', 'indigo.900',
 ]
 
 TYPE_BADGE = ['primary', 'indigo.500', 'coral.600', 'peacock.500', 'green.500']
@@ -46,6 +52,8 @@ class FieldViewOption(Model):
     translation_id = StringType(serialize_when_none=False)
     default = StringType(serialize_when_none=False)
     is_optional = BooleanType(serialize_when_none=False)
+    source_unit = StringType(serialize_when_none=False)
+    display_unit = StringType(serialize_when_none=False)
     postfix = StringType(serialize_when_none=False)
     prefix = StringType(serialize_when_none=False)
     field_description = StringType(serialize_when_none=False)
@@ -111,6 +119,9 @@ class TextDyField(BaseDynamicField):
         if 'reference' in kwargs:
             _data_source.update({'reference': kwargs.get('reference')})
 
+        if 'type' in kwargs:
+            _data_source.update({'type': kwargs.get('type')})
+
         return cls(_data_source)
 
 
@@ -137,15 +148,18 @@ class BadgeDyField(BaseDynamicField):
     @classmethod
     def data_source(cls, name, key, **kwargs):
         _data_source = {'key': key, 'name': name}
-
-        if 'options' in kwargs:
-            _data_source.update({'options': BadgeDyFieldOptions(kwargs.get('options'))})
-        else:
-            _data_source.update({'options': BadgeDyFieldOptions({'background_color': 'gray.200',
-                                                                 'text_color': 'gray.900'})})
+        _list_options = {'background_color': 'gray.200', 'text_color': 'gray.900'}
 
         if 'reference' in kwargs:
+            # default reference color
+            _list_options.update({'background_color': 'blue.600', 'text_color': 'white'})
             _data_source.update({'reference': kwargs.get('reference')})
+
+        if 'options' in kwargs:
+            _list_options.update(kwargs.get('options'))
+
+        if _list_options:
+            _data_source.update({'options': BadgeDyFieldOptions(_list_options)})
 
         return cls(_data_source)
 
@@ -235,26 +249,34 @@ class ListDyField(BaseDynamicField):
 
     @classmethod
     def data_source(cls, name, key, **kwargs):
+
         _data_source = {'key': key, 'name': name}
+        _list_options = {}
+
         if 'default_badge' in kwargs:
             _default_badge = kwargs.get('default_badge')
-            _list_options = {'delimiter': '  '}
+            _list_options.update({'delimiter': '  '})
 
             if 'type' in _default_badge and _default_badge.get('type') == 'outline':
                 _list_options.update({'item': BadgeItemDyField.set({'outline_color': 'violet.500'})})
             elif 'type' in _default_badge and _default_badge.get('type') == 'inline':
                 _list_options.update({'item': BadgeItemDyField.set({'background_color': 'violet.500'})})
-
+            # default reference color
+            elif 'type' in _default_badge and _default_badge.get('type') == 'reference':
+                _list_options.update({'item': BadgeItemDyField.set({'background_color': 'blue.600',
+                                                                    'text_color': 'white'})})
             if 'sub_key' in _default_badge:
                 _list_options.update({'sub_key': _default_badge.get('sub_key')})
 
             if 'delimiter' in _default_badge:
                 _list_options.update({'delimiter': _default_badge.get('delimiter')})
 
-            _data_source.update({'options': ListDyFieldOptions(_list_options)})
-
         if 'options' in kwargs:
-            _data_source.update({'options': ListDyFieldOptions(kwargs.get('options'))})
+            for k, v in kwargs.get('options').items():
+                _list_options.update({k: v})
+
+        if _list_options:
+            _data_source.update({'options': ListDyFieldOptions(_list_options)})
 
         if 'reference' in kwargs:
             _data_source.update({'reference': kwargs.get('reference')})
@@ -280,10 +302,10 @@ class EnumDyField(BaseDynamicField):
         for _key in _default_outline_badge:
             _round_index = len(TYPE_BADGE)
             _index = _default_outline_badge.index(_key)
-            _num = math.floor(_index/len(TYPE_BADGE))
+            _num = math.floor(_index / len(TYPE_BADGE))
 
             if _num > 0:
-                _round_index = len(TYPE_BADGE)*_num
+                _round_index = len(TYPE_BADGE) * _num
 
             if _round_index - 1 < _index:
                 _index = _index - _round_index

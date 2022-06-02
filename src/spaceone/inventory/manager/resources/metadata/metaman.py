@@ -1,7 +1,7 @@
 import copy
 from typing import (
     List,
-    Optional
+    Optional,
 )
 
 from spaceone.inventory.model.view.dynamic_field import BaseDynamicField
@@ -14,12 +14,24 @@ class CSTMeta:
         self.field_cls = field_cls
         self.name: str = name
         self.key: str = key
+        self.data_type = None
         self.kwargs = kwargs
         self.field: BaseDynamicField = field_cls.data_source(name, key, **kwargs)
         self.search: Optional[SearchField] = None
 
+        if 'data_type' in kwargs:
+
+            if kwargs.get('data_type') == int:
+                self.data_type = 'integer'
+
+            if kwargs.get('data_type') == float:
+                self.data_type = 'float'
+
         if 'auto_search' in kwargs and kwargs.get('auto_search'):
-            self.search = SearchField.set(name=name, key=key)
+            if self.data_type:
+                self.search = SearchField.set(name=name, key=key, data_type=self.data_type)
+            else:
+                self.search = SearchField.set(name=name, key=key)
 
     def __eq__(self, name: str):
         if name == self.name:
@@ -51,12 +63,12 @@ class CSTMetaGenerator:
         previous_field_index = self._get_cst_field_index(previous_field_name)
         self.cst_meta_list.insert(previous_field_index + 1, cst_meta)
 
-    def append_cst_meta_field(self, field_cls, name, key, **kwargs) -> None:
+    def append_cst_meta_field(self, field_cls: BaseDynamicField, name: str, key: str, **kwargs) -> None:
 
         cst_meta = self._create_cst_meta(field_cls, name, key, **kwargs)
         self.cst_meta_list.append(cst_meta)
 
-    def delete_cst_meta_field(self, name) -> None:
+    def delete_cst_meta_field(self, name: str) -> None:
         self.cst_meta_list.remove(name)
 
     @property
@@ -93,8 +105,12 @@ class CSTMetaGenerator:
 
             if kwargs.get("ignore_root_path"):
                 splited_key = key.split(".")
-                splited_key.remove(kwargs.get("ignore_root_path"))
-                key = ".".join(splited_key)
+
+                try:
+                    splited_key.remove(kwargs.get("ignore_root_path"))
+                    key = ".".join(splited_key)
+                except ValueError:
+                    pass
 
             if kwargs.get("add_root_path"):
                 add_key_path = kwargs.get("add_root_path")

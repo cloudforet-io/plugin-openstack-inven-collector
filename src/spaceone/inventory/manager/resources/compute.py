@@ -1,17 +1,27 @@
-import logging
+from spaceone.inventory.conf.global_conf import get_logger
 
 from openstack.compute.v2.server import Server
 
 from spaceone.inventory.manager.resources.metadata.cloud_service import compute as cs
 from spaceone.inventory.manager.resources.metadata.cloud_service_type import compute as cst
+from spaceone.inventory.manager.resources.metadata.cloud_service_type import availability_zone as cst_az
+from spaceone.inventory.manager.resources.metadata.cloud_service import availability_zone as cs_az
 from spaceone.inventory.manager.resources.resource import BaseResource
 from spaceone.inventory.model.resources.block_storage import VolumeModel
-from spaceone.inventory.model.resources.compute import FlavorModel
 from spaceone.inventory.model.resources.compute import InstanceModel
 from spaceone.inventory.model.resources.compute import NicModel
+from spaceone.inventory.model.resources.compute import ComputeQuotaModel
+from spaceone.inventory.model.resources.compute import ComputeAZModel
+from spaceone.inventory.model.resources.hypervisor import HypervisorModel
 from spaceone.inventory.model.resources.security_group import SecurityGroupModel
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = get_logger(__name__)
+
+from typing import (
+    List,
+    Dict,
+    Any
+)
 
 
 class InstanceResource(BaseResource):
@@ -27,13 +37,16 @@ class InstanceResource(BaseResource):
 
     def _set_custom_model_obj_values(self, model_obj: InstanceModel, resource: Server):
 
+        if resource.get('vm_state'):
+            self._set_obj_key_value(model_obj, 'vm_state', str(resource.vm_state).upper())
+
         if resource.get('security_groups'):
             security_group_names = list(dic['name'] for dic in resource.security_groups)
             security_groups = []
             security_group_rules = []
 
             for security_name in security_group_names:
-                security_group = self.get_resource_model_from_associated_resource('security_groups',
+                security_group = self.get_resource_model_from_associated_resource('SecurityGroupResource',
                                                                                   name=security_name,
                                                                                   project_id=resource.project_id)
 
@@ -49,18 +62,23 @@ class InstanceResource(BaseResource):
         if resource.get('attached_volumes'):
             attached_ids = list(dic['id'] for dic in resource.attached_volumes)
             attached_volumes = []
+            total_volume_size = 0
 
             for attached_id in attached_ids:
-                volume = self.get_resource_model_from_associated_resource('volumes', id=attached_id)
+                volume = self.get_resource_model_from_associated_resource('VolumeResource', id=attached_id)
                 if volume:
+                    total_volume_size += volume.size_gb
                     attached_volumes.append(volume)
                     if volume.is_bootable and volume.get('volume_image_metadata'):
                         self._set_obj_key_value(model_obj, 'image_name',
                                                 volume.get('volume_image_metadata').get('image_name'))
                 else:
+                    total_volume_size = None
                     attached_volumes.append(VolumeModel({"id": attached_id}))
 
             self._set_obj_key_value(model_obj, 'volumes', attached_volumes)
+            self._set_obj_key_value(model_obj, 'volume_count', len(attached_volumes))
+            self._set_obj_key_value(model_obj, 'total_volume_size', total_volume_size)
 
         if resource.get('addresses'):
             address_list = []
@@ -81,19 +99,16 @@ class InstanceResource(BaseResource):
             dic = resource.flavor
             ram = dic.get('ram')
 
-            if ram and ram != 0 and isinstance(ram, int):
-                dic['ram'] = int(dic.get('ram') / 1024)
-
             if 'original_name' in dic:
                 dic['name'] = dic['original_name']
                 del dic['original_name']
 
-            self._set_obj_key_value(model_obj, 'flavor', FlavorModel(dic))
+            self._set_obj_key_value(model_obj, 'flavor', dic)
 
         if resource.get('compute_host'):
 
             hypervisor_name = resource.compute_host
-            hypervisor = self.get_resource_model_from_associated_resource('hypervisors',
+            hypervisor = self.get_resource_model_from_associated_resource('HypervisorResource',
                                                                           name=hypervisor_name)
 
             self._set_obj_key_value(model_obj, 'hypervisor_name', hypervisor_name)
@@ -102,9 +117,71 @@ class InstanceResource(BaseResource):
                 self._set_obj_key_value(model_obj, 'hypervisor_id', hypervisor.id)
 
 
-class FlavorResource(BaseResource):
-    _model_cls = FlavorModel
+class ComputeQuotaResource(BaseResource):
+    _model_cls = ComputeQuotaModel
     _proxy = 'compute'
-    _resource = 'flavors'
-    _cloud_service_type = 'Flavor'
-    _cloud_service_group = 'Compute'
+    _resource = 'get_quota_set_detail'
+    _resource_path = "/project/"
+    _native_all_projects_query_support = False
+    _native_project_id_query_support = True
+    _project_key = 'project'
+
+
+class ComputeAZResource(BaseResource):
+    _model_cls = ComputeAZModel
+    _proxy = 'compute'
+    _resource = 'availability_zones'
+    _resource_path = "/admin/aggregates/"
+    _native_all_projects_query_support = False
+    _native_project_id_query_support = False
+    _cloud_service_type_resource = cst_az.CLOUD_SERVICE_TYPE
+    _cloud_service_meta = cs_az.CLOUD_SERVICE_METADATA
+    _associated_resource_cls_list = ['HypervisorResource']
+
+    def __init__(self, conn, **kwargs):
+        super().__init__(conn, **kwargs)
+        self._default_args = (True,)  # details=True
+
+    def _set_custom_model_obj_values(self, model_obj: ComputeAZModel, resource: Any):
+
+        # create unique id
+        self._set_obj_key_value(model_obj, 'id',
+                                f"{self.default_project_id}-{self.resource_name.lower()}-{resource.name.lower()}")
+
+        hosts = resource.hosts
+
+        if hosts:
+
+            hypervisors: HypervisorModel = self.get_resource_model_from_associated_resources('HypervisorResource')
+            hosts_list = []
+
+            total_memory_size = 0
+            total_memory_used = 0
+            total_running_vms = 0
+            total_vcpus = 0
+            total_vcpus_used = 0
+
+            for hypervisor in hypervisors:
+                if hypervisor.name in hosts.keys():
+                    hosts_list.append(hypervisor)
+                    if hypervisor.memory_size:
+                        total_memory_size += hypervisor.memory_size
+                    if hypervisor.memory_used:
+                        total_memory_used += hypervisor.memory_used
+                    if hypervisor.running_vms:
+                        total_running_vms += hypervisor.running_vms
+                    if hypervisor.vcpus:
+                        total_vcpus += hypervisor.vcpus
+                    if hypervisor.vcpus_used:
+                        total_vcpus_used += hypervisor.vcpus_used
+
+            total_memory_free = total_memory_size - total_memory_used
+
+            self._set_obj_key_value(model_obj, 'hypervisors', hosts_list)
+            self._set_obj_key_value(model_obj, 'total_memory_size', total_memory_size)
+            self._set_obj_key_value(model_obj, 'total_memory_used', total_memory_used)
+            self._set_obj_key_value(model_obj, 'total_memory_free', total_memory_free)
+            self._set_obj_key_value(model_obj, 'total_running_vms', total_running_vms)
+            self._set_obj_key_value(model_obj, 'total_vcpus', total_vcpus)
+            self._set_obj_key_value(model_obj, 'total_vcpus_used', total_vcpus_used)
+
