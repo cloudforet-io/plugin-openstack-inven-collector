@@ -2,7 +2,7 @@
 provider: openstack
 cloud_service_group: Compute
 cloud_service_type: Hypervisor
-name: Total Memory(GiB)
+name: Total Memory
 query:
   aggregate:
     - group:
@@ -13,5 +13,7 @@ query:
 options:
   value_options:
     key: value
+    type: size
     options:
       default: 0
+      source_unit: MB

@@ -1,0 +1,19 @@
+---
+provider: openstack
+cloud_service_group: Compute
+cloud_service_type: Instance
+name: Total Volume
+query:
+  aggregate:
+    - group:
+        fields:
+          - name: value
+            key: data.total_volume_size
+            operator: sum
+options:
+  value_options:
+    key: value
+    type: size
+    options:
+      default: 0
+      source_unit: GB

@@ -1,12 +1,20 @@
-import logging
+from spaceone.inventory.conf.global_conf import get_logger
 from openstack.block_storage.v2.volume import Volume
 
 from spaceone.inventory.manager.resources.metadata.cloud_service import block_storage as cs
 from spaceone.inventory.manager.resources.metadata.cloud_service_type import block_storage as cst
 from spaceone.inventory.manager.resources.resource import BaseResource
 from spaceone.inventory.model.resources.block_storage import VolumeModel
+from spaceone.inventory.model.resources.block_storage import VolumeQuotaModel
+from spaceone.inventory.error.base import CollectorError
 
-_LOGGER = logging.getLogger(__name__)
+from typing import (
+    List,
+    Dict,
+    Any
+)
+
+_LOGGER = get_logger(__name__)
 
 
 class VolumeResource(BaseResource):
@@ -28,3 +36,17 @@ class VolumeResource(BaseResource):
             giga_to_byte = 1024 * 1024 * 1024
             self._set_obj_key_value(model_obj, 'size_gb', resource.size)
             self._set_obj_key_value(model_obj, 'size', resource.size * giga_to_byte)
+
+
+class VolumeQuotaResource(BaseResource):
+    _model_cls = VolumeQuotaModel
+    _proxy = 'block_storage'
+    _resource = 'get_quota_set'
+    _resource_path = "/project/"
+    _native_all_projects_query_support = False
+    _native_project_id_query_support = True
+    _project_key = 'project'
+
+    def __init__(self, conn, **kwargs):
+        super().__init__(conn, **kwargs)
+        self._default_kwargs = {"usage": True}

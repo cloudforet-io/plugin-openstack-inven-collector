@@ -1,0 +1,25 @@
+---
+provider: openstack
+cloud_service_group: Compute
+cloud_service_type: Hypervisor
+name: Memory Usage
+query:
+  aggregate:
+    - group:
+        keys:
+          - name: name
+            key: "Memory"
+        fields:
+          - name: value
+            key: data.memory_used
+            operator: sum
+          - name: value
+            key: data.memory_free
+            operator: sum
+options:
+  chart_type: DONUT
+  value_options:
+    key: value
+    type: size
+    options:
+      source_unit: MB

@@ -1,0 +1,16 @@
+---
+provider: openstack
+cloud_service_group: Network
+cloud_service_type: SecurityGroup
+name: Total Count
+query:
+  aggregate:
+    - group:
+        fields:
+          - name: value
+            operator: count
+options:
+  value_options:
+    key: value
+    options:
+      default: 0

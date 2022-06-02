@@ -1,4 +1,5 @@
-import logging
+from spaceone.inventory.conf.global_conf import get_logger
+
 from openstack.network.v2.security_group import SecurityGroup
 
 from spaceone.inventory.manager.resources.metadata.cloud_service import security_group as cs
@@ -7,7 +8,7 @@ from spaceone.inventory.manager.resources.resource import BaseResource
 from spaceone.inventory.model.resources.security_group import SecurityGroupModel
 from spaceone.inventory.model.resources.security_group import SecurityGroupRuleModel
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = get_logger(__name__)
 
 class SecurityGroupResource(BaseResource):
     _model_cls = SecurityGroupModel

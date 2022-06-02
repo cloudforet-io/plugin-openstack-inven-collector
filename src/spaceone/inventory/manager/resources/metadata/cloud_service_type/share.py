@@ -4,7 +4,7 @@ from spaceone.inventory.libs.common_parser import get_data_from_yaml
 from spaceone.inventory.manager.resources.metadata.metaman import CSTMetaGenerator
 from spaceone.inventory.model.common.response import CloudServiceTypeResource
 from spaceone.inventory.model.view.cloud_service_type import CloudServiceTypeMeta
-from spaceone.inventory.model.view.dynamic_field import TextDyField, EnumDyField, DateTimeDyField
+from spaceone.inventory.model.view.dynamic_field import TextDyField, EnumDyField, DateTimeDyField, BadgeDyField
 from spaceone.inventory.model.view.dynamic_widget import ChartWidget, CardWidget
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -43,10 +43,14 @@ CST_SHARE_META.append_cst_meta_field(EnumDyField, 'Status', 'data.status', defau
     'alert': ['error', 'error_deleting', 'manage_error', 'unmanage_error', 'extending_error', 'shrinking_error',
               'shrinking_possible_data_loss_error', 'reverting_error']
 })
-CST_SHARE_META.append_cst_meta_field(TextDyField, 'Size(GiB)', 'data.size_gb', auto_search=True)
+CST_SHARE_META.append_cst_meta_field(TextDyField, 'Size', 'data.size_gb', auto_search=True, data_type=int,
+                                     type="size", options={"source_unit": "GB", "display_unit": "GB"})
 CST_SHARE_META.append_cst_meta_field(TextDyField, 'Type', 'data.share_type', auto_search=True)
-CST_SHARE_META.append_cst_meta_field(EnumDyField, 'Protocol', 'data.share_proto', auto_search=True,
-                                     default_badge={'indigo.500': ['NFS'], 'coral.600': ['CIFS']})
+CST_SHARE_META.append_cst_meta_field(EnumDyField, 'Protocol', 'data.share_protocol', auto_search=True,
+                                     default_badge={
+                                         'coral.600': ['NFS'], 'indigo.500': ['CIFS'], 'peacock.500': ['GLUSTERFS'],
+                                         'green.500': ['HDFS'], 'red.500': ['CEPHFS'],
+                                         'violet.500': ['MAPRFS'] })
 CST_SHARE_META.append_cst_meta_field(TextDyField, 'Export', 'data.export_location', auto_search=True)
 CST_SHARE_META.append_cst_meta_field(TextDyField, 'Exports', 'data.export_locations', auto_search=True,
                                      options={'is_optional': True})
@@ -58,7 +62,9 @@ CST_SHARE_META.append_cst_meta_field(TextDyField, 'Host', 'data.host', auto_sear
 CST_SHARE_META.append_cst_meta_field(EnumDyField, 'Public', 'data.is_public', auto_search=True,
                                      default_badge={'indigo.500': ['true'], 'coral.600': ['false']})
 CST_SHARE_META.append_cst_meta_field(TextDyField, 'Project Name', 'data.project_name', auto_search=True)
-CST_SHARE_META.append_cst_meta_field(TextDyField, 'Project ID', 'data.project_id', auto_search=True,
+CST_SHARE_META.append_cst_meta_field(BadgeDyField, 'Project ID', 'data.project_id', auto_search=True,
+                                     reference={"resource_type": "inventory.CloudService",
+                                                "reference_key": "reference.resource_id"},
                                      options={'is_optional': True})
 CST_SHARE_META.append_cst_meta_field(TextDyField, 'Snapshot', 'data.snapshot_id', auto_search=True,
                                      options={'is_optional': True})

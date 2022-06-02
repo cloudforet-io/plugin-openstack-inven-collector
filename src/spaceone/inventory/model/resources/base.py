@@ -1,5 +1,5 @@
 from schematics import Model
-from schematics.types import StringType, ModelType, BooleanType
+from schematics.types import StringType, ModelType, BooleanType, ListType
 
 
 class ReferenceModel(Model):
@@ -16,13 +16,14 @@ class ResourceModel(Model):
     region_name = StringType()
     project_id = StringType(serialize_when_none=False)
     project_name = StringType(serialize_when_none=False)
+    tags = ListType(StringType, default=[])
 
 class Secret(Model):
     username = StringType(required=True)
     password = StringType(required=True)
     project_id = StringType(required=True)
-    user_domain_name = StringType(required=True)
-    region_name = StringType(required=True)
+    user_domain_name = StringType(required=True, default="Default")
+    region_name = StringType(required=True, default="RegionOne")
     auth_url = StringType(required=True)
     interface = StringType(default="public")
     identity_api_version = StringType(default="3")

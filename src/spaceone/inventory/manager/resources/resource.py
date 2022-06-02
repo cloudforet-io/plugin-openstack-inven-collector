@@ -1,5 +1,5 @@
-import logging
-import json
+from spaceone.inventory.conf.global_conf import get_logger
+
 from typing import (
     Any,
     List,
@@ -7,7 +7,8 @@ from typing import (
     Optional,
     Tuple,
     Iterator,
-    Final
+    Final,
+    Generator
 )
 from urllib.parse import urljoin
 
@@ -23,9 +24,9 @@ from spaceone.inventory.model.resources.base import ReferenceModel
 from spaceone.inventory.model.resources.base import ResourceModel
 from spaceone.inventory.model.view.cloud_service import CloudServiceMeta
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = get_logger(__name__)
 
-DATETIME_KEYS: Final[List[str]] = ['attached_at', 'created_at', 'updated_at', 'launched_at']
+DATETIME_KEYS: Final[List[str]] = ['attached_at', 'created_at', 'updated_at', 'launched_at', 'password_expires_at']
 
 
 class BaseResource(object):
@@ -35,29 +36,33 @@ class BaseResource(object):
     _cloud_service_type_resource: Optional[CloudServiceTypeResource] = None
     _cloud_service_meta: Optional[CloudServiceMeta] = None
     _resource_path: Final[str] = ""
+    _associated_resource_cls_list: List['BaseResource'] = []
     _native_all_projects_query_support: Final[bool] = False
     _native_project_id_query_support: Final[bool] = False
+    _project_key: Final[str] = 'project_id'
 
     def __init__(self, conn: Connection, **kwargs):
         self._conn: Connection = conn
         self._dashboard_url: Optional[str] = None
         self._all_projects: bool = False
-        self._associated_resource_cls_list: List['BaseResource'] = []
         self._associated_resource_list: List[Tuple[ResourceModel, 'BaseResource']] = []
         self._projects: Dict[str] = {}
         self._default_args: Tuple = ()
         self._default_kwargs: Dict = {}
 
-        if 'default_args' in kwargs:
+        if kwargs.get('default_project_id'):
+            self._default_project_id = kwargs.get('default_project_id')
+
+        if kwargs.get('default_args'):
             self._default_args = kwargs.get('default_args')
 
-        if 'default_kwargs' in kwargs:
-            self.default_kwargs = kwargs.get('default_kwargs')
+        if kwargs.get('default_kwargs'):
+            self._default_kwargs = kwargs.get('default_kwargs')
 
-        if 'all_projects' in kwargs:
+        if kwargs.get('all_projects'):
             self._all_projects = kwargs.get('all_projects')
 
-        if 'dashboard_url' in kwargs:
+        if kwargs.get('dashboard_url'):
             self._dashboard_url = kwargs.get('dashboard_url')
 
         try:
@@ -74,6 +79,10 @@ class BaseResource(object):
         mod = __import__(module_name, fromlist=[module_name])
         cls = getattr(mod, class_name)
         return cls
+
+    @property
+    def default_project_id(self):
+        return self._default_project_id
 
     @property
     def args(self):
@@ -93,7 +102,7 @@ class BaseResource(object):
 
     @property
     def resource_name(self) -> str:
-        return self._resource
+        return self.__class__.__name__
 
     @property
     def cloud_service_meta(self) -> CloudServiceMeta:
@@ -144,9 +153,17 @@ class BaseResource(object):
                         and self._native_project_id_query_support:
 
                     resources_list = []
+
                     for project_id in self._projects.keys():
-                        kwargs['project_id'] = project_id
-                        resources_list += resource_method(*args, **kwargs)
+                        kwargs[self._project_key] = project_id
+
+                        rtn = resource_method(*args, **kwargs)
+
+                        if isinstance(rtn, list) or isinstance(rtn, Generator):
+                            resources_list += rtn
+                        else:
+                            resources_list.append(rtn)
+
                     return resources_list
 
                 return resource_method(*args, **kwargs)
@@ -170,8 +187,8 @@ class BaseResource(object):
 
     def __set_default_model_obj_region(self, model_obj: Any, resource: Any):
 
-        if resource.get('location') and resource.location.get('region_name'):
-            self._set_obj_key_value(model_obj, 'region_name', resource.location.region_name)
+        if resource.get('location') and resource.get('location').get('region_name'):
+            self._set_obj_key_value(model_obj, 'region_name', resource.get('location').get('region_name'))
 
     def __set_default_model_obj_links(self, model_obj: Any, resource: Any):
 
@@ -179,12 +196,20 @@ class BaseResource(object):
 
             dic = {}
 
-            for link in resource.links:
-                if link['rel'] == 'self':
-                    dic['self_link'] = link['href']
+            if isinstance(resource.get('links'), list):
+                for link in resource.links:
+                    if link['rel'] == 'self':
+                        dic['self_link'] = link['href']
 
-                if link['rel'] == 'bookmark':
-                    dic['bookmark_link'] = link['href']
+                    if link['rel'] == 'bookmark':
+                        dic['bookmark_link'] = link['href']
+
+            elif isinstance(resource.get('links'), dict):
+                if resource.links.get('self'):
+                    dic['self_link'] = resource.links.get('self')
+
+                if resource.links.get('bookmark'):
+                    dic['bookmark_link'] = resource.links.get('bookmark')
 
             self._set_obj_key_value(model_obj, 'reference', ReferenceModel(dic))
 
@@ -204,11 +229,11 @@ class BaseResource(object):
             self._set_obj_key_value(model_obj, 'external_link', urljoin(base=self.external_url,
                                                                         url=self._resource_path.format(**kwargs)))
 
-    def get_resource_model_from_associated_resource(self, resource_type: str, **kwargs) \
+    def get_resource_model_from_associated_resource(self, resource_cls_name: str, **kwargs) \
             -> Optional[ResourceModel]:
 
         for resource_model, resource in self._associated_resource_list:
-            if resource.resource_name == resource_type:
+            if resource.__class__.__name__ == resource_cls_name:
                 matched = True
 
                 for key, value in kwargs.items():
@@ -221,18 +246,24 @@ class BaseResource(object):
 
         return None
 
-    def get_resource_model_from_associated_resources(self, resource_type: str, **kwargs) \
-            -> Optional[ResourceModel]:
+    def get_resource_model_from_associated_resources(self, resource_cls_name: str, **kwargs) \
+            -> List[ResourceModel]:
 
         rtn_list = []
 
         for resource_model, resource in self._associated_resource_list:
-            if resource.resource_name == resource_type:
+            if resource.__class__.__name__ == resource_cls_name:
+                # Default is True if search key not exists.
                 matched = True
                 for key, value in kwargs.items():
-                    if hasattr(resource_model, key) and getattr(resource_model, key) != value:
+
+                    if (hasattr(resource_model, key) and getattr(resource_model, key) != value) or\
+                       not hasattr(resource_model, key):
                         matched = False
                         continue
+
+                    if hasattr(resource_model, key) and getattr(resource_model, key) == value:
+                        matched = True
 
                 if matched:
                     rtn_list.append(resource_model)
@@ -244,19 +275,28 @@ class BaseResource(object):
         for class_name in self._associated_resource_cls_list:
             associated_resource = self.get_resource_class(class_name)(self._conn, **kwargs)
 
+            if associated_resource:
+                _LOGGER.info(f"Collecting related resources : {associated_resource.resource_name}")
+
             if self.all_projects:
                 associated_resource.all_projects = True
+
             try:
                 for resource in associated_resource.collect():
                     self._associated_resource_list.append(resource)
+
             except Exception as e:
                 _LOGGER.error(e)
+                raise
 
     def _create_obj(self, model_cls: ResourceModel, resource: Resource, **kwargs) -> (ResourceModel, Resource):
 
         model_obj = model_cls()
 
-        resource_dic = resource.to_dict()
+        if isinstance(resource, dict):
+            resource_dic = resource
+        else:
+            resource_dic = resource.to_dict()
 
         for key, value in resource_dic.items():
             if hasattr(model_obj, key):
@@ -275,12 +315,25 @@ class BaseResource(object):
 
     def collect(self, **kwargs) -> Iterator[Tuple[ResourceModel, 'BaseResource']]:
 
+        collect_associated_resource = kwargs.get('collect_associated_resource')
+
         # for openstack manager collection request only
-        if kwargs.get('collect_associated_resource'):
+        if collect_associated_resource:
+            _LOGGER.info(f"Start collecting resources : {self.resource_name}")
             self._collect_associated_resource()
 
         try:
+            _LOGGER.info(f"Customizing collected resource : {self.resource_name}")
+
             for resource in self.resources:
                 yield self._create_obj(self._model_cls, resource), self
+
         except Exception as e:
-            _LOGGER.error(e)
+            if e.__class__.__name__ == "EndpointNotFound":
+                _LOGGER.info(f"{self.resource_name} : {e}")
+            else:
+                _LOGGER.error(f"{self.resource_name} : {e}")
+                raise
+        finally:
+            if collect_associated_resource:
+                _LOGGER.info(f"Collecting resources is done. : {self.resource_name} ")

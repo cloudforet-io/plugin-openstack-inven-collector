@@ -1,0 +1,16 @@
+---
+provider: openstack
+cloud_service_group: Identity
+cloud_service_type: User
+name: Total Count
+query:
+  aggregate:
+    - group:
+        fields:
+          - name: value
+            operator: count
+options:
+  value_options:
+    key: value
+    options:
+      default: 0

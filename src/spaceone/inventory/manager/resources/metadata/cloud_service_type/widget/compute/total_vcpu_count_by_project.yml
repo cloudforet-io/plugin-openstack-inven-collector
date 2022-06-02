@@ -2,16 +2,18 @@
 provider: openstack
 cloud_service_group: Compute
 cloud_service_type: Instance
-name: Total Memory(GiB)
+name: Total vCPUs by Project
 query:
   aggregate:
     - group:
+        keys:
+          - name: name
+            key: data.project_name
         fields:
           - name: value
-            key: data.flavor.ram
+            key: data.flavor.vcpus
             operator: sum
 options:
+  chart_type: DONUT
   value_options:
     key: value
-    options:
-      default: 0
