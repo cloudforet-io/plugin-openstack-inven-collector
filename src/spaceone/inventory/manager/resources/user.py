@@ -1,14 +1,12 @@
-from spaceone.inventory.model.resources.user import UserModel, RoleModel, RoleAssignmentModel
-from spaceone.inventory.manager.resources.resource import BaseResource
-from spaceone.inventory.manager.resources.metadata.cloud_service_type import user as cst
-from spaceone.inventory.manager.resources.metadata.cloud_service import user as cs
-from spaceone.inventory.model.common.response import CloudServiceTypeResource
-
 from typing import (
-    List,
-    Dict,
     Any
 )
+
+from spaceone.inventory.manager.resources.metadata.cloud_service import user as cs
+from spaceone.inventory.manager.resources.metadata.cloud_service_type import user as cst
+from spaceone.inventory.manager.resources.resource import BaseResource
+from spaceone.inventory.model.common.response import CloudServiceTypeResource
+from spaceone.inventory.model.resources.user import UserModel, RoleModel, RoleAssignmentModel
 
 
 class UserResource(BaseResource):
@@ -17,7 +15,7 @@ class UserResource(BaseResource):
     _resource = 'users'
     _cloud_service_type_resource = cst.CLOUD_SERVICE_TYPE
     _cloud_service_meta = cs.CLOUD_SERVICE_METADATA
-    _resource_path = "/identity/users/{id}/detail/"
+    _resource_path = "/identity/users/{id}/detail"
     _native_all_projects_query_support = False
     _native_project_id_query_support = False
     _associated_resource_cls_list = ['RoleResource', 'RoleAssignmentResource']

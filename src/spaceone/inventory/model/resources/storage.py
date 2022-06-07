@@ -1,4 +1,4 @@
-from schematics.types import ListType, StringType, IntType, DateTimeType, BooleanType, FloatType, DictType
+from schematics.types import ListType, StringType, IntType, FloatType, DictType
 
 from spaceone.inventory.model.resources.base import ResourceModel
 

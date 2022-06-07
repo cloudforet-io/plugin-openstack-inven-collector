@@ -1,12 +1,15 @@
-from spaceone.inventory.conf.global_conf import get_logger
+from typing import (
+    Final
+)
 
 from openstack.shared_file_system.v2.share import Share
 
+from spaceone.inventory.conf.global_conf import get_logger
 from spaceone.inventory.manager.resources.metadata.cloud_service import share as cs
 from spaceone.inventory.manager.resources.metadata.cloud_service_type import share as cst
 from spaceone.inventory.manager.resources.resource import BaseResource
-from spaceone.inventory.model.resources.share import ShareModel, ShareNetworkModel
 from spaceone.inventory.model.common.response import CloudServiceTypeResource
+from spaceone.inventory.model.resources.share import ShareModel, ShareNetworkModel
 
 _LOGGER = get_logger(__name__)
 
@@ -17,7 +20,7 @@ class ShareResource(BaseResource):
     _resource = 'shares'
     _cloud_service_type_resource = cst.CLOUD_SERVICE_TYPE
     _cloud_service_meta = cs.CLOUD_SERVICE_METADATA
-    _resource_path = "/auth/switch/{project_id}/?next=/project/shares/{id}"
+    _resource_path = "/admin/shares/{id}"
     _native_all_projects_query_support = True
     _native_project_id_query_support = True
     _associated_resource_cls_list = ['ShareNetworkResource']
@@ -43,7 +46,8 @@ class ShareNetworkResource(BaseResource):
     _model_cls = ShareNetworkModel
     _proxy = 'share'
     _resource = 'share_networks'
-    _resource_path = "/project/share_networks/{id}"
+    _is_dashboard_auth_switch: Final[bool] = False
+    _resource_path = "/admin/share_networks/{id}"
     _cloud_service_type_resource = CloudServiceTypeResource({"name": "ShareNetwork", "group": "Network"})
     _native_all_projects_query_support = True
     _native_project_id_query_support = True

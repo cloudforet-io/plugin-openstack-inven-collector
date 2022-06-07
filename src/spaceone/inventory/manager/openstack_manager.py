@@ -1,6 +1,4 @@
-import openstack
 import json
-
 from typing import (
     List,
     Dict,
@@ -11,10 +9,12 @@ from typing import (
     Iterator
 )
 
-from spaceone.inventory.conf.global_conf import get_logger
-
+import openstack
 from openstack.connection import Connection
 from spaceone.core.manager import BaseManager
+
+from spaceone.inventory.conf.global_conf import get_logger
+from spaceone.inventory.error.base import CollectorError
 from spaceone.inventory.manager import resources
 from spaceone.inventory.model.common.base import CloudServiceReferenceModel
 from spaceone.inventory.model.common.base import CloudServiceResource
@@ -22,7 +22,6 @@ from spaceone.inventory.model.common.response import CloudServiceResponse
 from spaceone.inventory.model.common.response import CloudServiceTypeResourceResponse
 from spaceone.inventory.model.resources.base import ResourceModel
 from spaceone.inventory.model.resources.base import Secret
-from spaceone.inventory.error.base import CollectorError
 
 _LOGGER = get_logger(__name__)
 
@@ -129,9 +128,6 @@ class OpenstackManager(BaseManager):
 
             if 'dashboard_url' in kwargs.get('secret_data'):
                 dic['dashboard_url'] = kwargs.get('secret_data').get('dashboard_url')
-
-            if 'project_id' in kwargs.get('secret_data'):
-                dic['default_project_id'] = kwargs.get('secret_data').get('project_id')
 
         for resource_cls in self._resource_cls_list:
             resource_obj = resource_cls(self.conn, **dic)

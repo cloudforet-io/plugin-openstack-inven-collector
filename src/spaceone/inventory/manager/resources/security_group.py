@@ -1,7 +1,6 @@
-from spaceone.inventory.conf.global_conf import get_logger
-
 from openstack.network.v2.security_group import SecurityGroup
 
+from spaceone.inventory.conf.global_conf import get_logger
 from spaceone.inventory.manager.resources.metadata.cloud_service import security_group as cs
 from spaceone.inventory.manager.resources.metadata.cloud_service_type import security_group as cst
 from spaceone.inventory.manager.resources.resource import BaseResource
@@ -10,11 +9,16 @@ from spaceone.inventory.model.resources.security_group import SecurityGroupRuleM
 
 _LOGGER = get_logger(__name__)
 
+from typing import (
+    Final,
+)
+
 class SecurityGroupResource(BaseResource):
     _model_cls = SecurityGroupModel
     _proxy = 'network'
     _resource = 'security_groups'
-    _resource_path = "/auth/switch/{project_id}/?next=/project/security_groups/{id}"
+    _is_admin_dashboard: Final[bool] = False
+    _resource_path = "/project/security_groups/{id}"
     _cloud_service_type_resource = cst.CLOUD_SERVICE_TYPE
     _cloud_service_meta = cs.CLOUD_SERVICE_METADATA
     _native_all_projects_query_support = False

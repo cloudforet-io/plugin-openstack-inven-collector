@@ -37,6 +37,7 @@ class InstanceModel(ResourceModel):
     updated_at = DateTimeType()
     launched_at = DateTimeType()
     image_name = StringType()
+    image_id = StringType()
     metadata = DictType(StringType, default={})
     security_groups = ListType(ModelType('SecurityGroupModel'), default=[])
     security_group_rules = ListType(ModelType('SecurityGroupRuleModel'), default=[])
@@ -78,5 +79,19 @@ class ComputeAZModel(ResourceModel):
     total_running_vms = IntType()
     total_vcpus = IntType()
     total_vcpus_used = IntType()
+    total_vcpus_free = IntType()
     hypervisors = ListType(ModelType('HypervisorModel', default=[]))
+
+
+class ServerGroupModel(ResourceModel):
+
+    name = StringType()
+    member_ids = ListType(StringType, default=None)
+    metadata = DictType(StringType, serialize_when_none=False)
+    policy = StringType()
+    policies = ListType(StringType, default=None)
+    user_id = StringType()
+    rules = DictType(StringType, serialize_when_none=False)
+    member_count = IntType()
+    instances = ListType(ModelType(InstanceModel), serialize_when_none=False)
 

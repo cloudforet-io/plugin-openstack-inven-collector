@@ -1,13 +1,12 @@
 import os
 
+from spaceone.inventory.libs.common_parser import get_data_from_yaml
 from spaceone.inventory.manager.resources.metadata.metaman import CSTMetaGenerator
 from spaceone.inventory.model.common.response import CloudServiceTypeResource
 from spaceone.inventory.model.view.cloud_service_type import CloudServiceTypeMeta
 from spaceone.inventory.model.view.dynamic_field import TextDyField, EnumDyField, DateTimeDyField, \
     ListDyField, BadgeDyField
-
 from spaceone.inventory.model.view.dynamic_widget import ChartWidget, CardWidget
-from spaceone.inventory.libs.common_parser import get_data_from_yaml
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 

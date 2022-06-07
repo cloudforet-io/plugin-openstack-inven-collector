@@ -1,8 +1,8 @@
-from spaceone.inventory.model.view.dynamic_field import TextDyField, EnumDyField
-from spaceone.inventory.model.view.dynamic_layout import ItemDynamicLayout, TableDynamicLayout
-from spaceone.inventory.model.view.cloud_service import CloudServiceMeta
 from spaceone.inventory.manager.resources.metadata.cloud_service_type.project import CST_PROJECT_META
 from spaceone.inventory.manager.resources.metadata.metaman import CSTMetaGenerator
+from spaceone.inventory.model.view.cloud_service import CloudServiceMeta
+from spaceone.inventory.model.view.dynamic_field import TextDyField, EnumDyField
+from spaceone.inventory.model.view.dynamic_layout import ItemDynamicLayout, TableDynamicLayout
 
 CS_PROJECT_META = CSTMetaGenerator(CST_PROJECT_META)
 CS_PROJECT_META.append_cst_meta_field(TextDyField, 'Option', 'data.options')

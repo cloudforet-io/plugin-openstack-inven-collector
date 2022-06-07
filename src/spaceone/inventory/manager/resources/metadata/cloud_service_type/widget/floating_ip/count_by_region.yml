@@ -1,0 +1,21 @@
+---
+provider: openstack
+cloud_service_group: Network
+cloud_service_type: Floating IP
+name: Count by Region
+query:
+  aggregate:
+    - group:
+        keys:
+          - name: name
+            key: region_code
+        fields:
+          - name: value
+            operator: count
+options:
+  chart_type: COLUMN
+  name_options:
+    key: name
+    reference:
+      resource_type: "inventory.Region"
+      reference_key: region_code
