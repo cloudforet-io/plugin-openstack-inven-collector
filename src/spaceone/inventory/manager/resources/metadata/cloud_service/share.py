@@ -2,13 +2,13 @@ from spaceone.inventory.manager.resources.metadata.cloud_service_type.share impo
 from spaceone.inventory.manager.resources.metadata.metaman import CSTMetaGenerator
 from spaceone.inventory.model.view.cloud_service import CloudServiceMeta
 from spaceone.inventory.model.view.dynamic_field import TextDyField, DateTimeDyField, BadgeDyField, EnumDyField
-from spaceone.inventory.model.view.dynamic_layout import ItemDynamicLayout, TableDynamicLayout
+from spaceone.inventory.model.view.dynamic_layout import ItemDynamicLayout
 
 CS_SHARE_META = CSTMetaGenerator(CST_SHARE_META)
 
 CS_SHARE_META.insert_cst_meta_field('ID', TextDyField, 'Description', 'data.description')
 CS_SHARE_META.insert_cst_meta_field('Size', TextDyField, 'Size', 'data.size', type="size",
-                                    options={"source_unit": "KB", "display_unit": "KB"} )
+                                    options={"display_unit": "BYTES"})
 CS_SHARE_META.append_cst_meta_field(TextDyField, 'selfLink', 'data.reference.self_link')
 CS_SHARE_META.append_cst_meta_field(TextDyField, 'bookmarkLink', 'data.reference.bookmark_link')
 CS_SHARE_META.append_cst_meta_field(TextDyField, 'externalLink', 'data.external_link')

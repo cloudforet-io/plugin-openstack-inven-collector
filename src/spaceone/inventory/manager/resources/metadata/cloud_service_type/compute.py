@@ -4,7 +4,8 @@ from spaceone.inventory.libs.common_parser import get_data_from_yaml
 from spaceone.inventory.manager.resources.metadata.metaman import CSTMetaGenerator
 from spaceone.inventory.model.common.response import CloudServiceTypeResource
 from spaceone.inventory.model.view.cloud_service_type import CloudServiceTypeMeta
-from spaceone.inventory.model.view.dynamic_field import TextDyField, DateTimeDyField, ListDyField, EnumDyField, BadgeDyField
+from spaceone.inventory.model.view.dynamic_field import TextDyField, DateTimeDyField, ListDyField, EnumDyField, \
+    BadgeDyField
 from spaceone.inventory.model.view.dynamic_widget import ChartWidget, CardWidget
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -40,7 +41,8 @@ CST_INSTANCE_META.append_cst_meta_field(BadgeDyField, 'ID', 'data.id', auto_sear
                                         reference={"resource_type": "inventory.CloudService",
                                                    "reference_key": "reference.resource_id"},
                                         options={'is_optional': True})
-CST_INSTANCE_META.append_cst_meta_field(TextDyField, 'Host Name', 'data.hostname')
+CST_INSTANCE_META.append_cst_meta_field(TextDyField, 'Host Name', 'data.hostname', auto_search=True,
+                                        options={'is_optional': True})
 CST_INSTANCE_META.append_cst_meta_field(EnumDyField, 'Status', 'data.status', auto_search=True,
                                         default_state={
                                             'safe': ['ACTIVE'],
@@ -54,19 +56,22 @@ CST_INSTANCE_META.append_cst_meta_field(EnumDyField, 'Status', 'data.status', au
 CST_INSTANCE_META.append_cst_meta_field(EnumDyField, 'VM State', 'data.vm_state', auto_search=True,
                                         default_state={
                                             'safe': ['ACTIVE'],
-                                            'available': ['BUILD', 'RESCUED', 'RESIZED', 'SHELVED', 'SHELVED_OFFLOADED'],
+                                            'available': ['BUILD', 'RESCUED', 'RESIZED', 'SHELVED',
+                                                          'SHELVED_OFFLOADED'],
                                             'warning': ['BUILDING'],
-                                            'disable': ['DELETED','PAUSED', 'SOFT_DELETED', 'STOPPED', 'SUSPENDED'],
+                                            'disable': ['DELETED', 'PAUSED', 'SOFT_DELETED', 'STOPPED', 'SUSPENDED'],
                                             'alert': ['ERROR']}
                                         )
 CST_INSTANCE_META.append_cst_meta_field(TextDyField, 'Flavor', 'data.flavor.name', auto_search=True)
 CST_INSTANCE_META.append_cst_meta_field(TextDyField, 'vCPU', 'data.flavor.vcpus', auto_search=True, data_type=int)
 CST_INSTANCE_META.append_cst_meta_field(TextDyField, 'Memory', 'data.flavor.ram', auto_search=True, data_type=int,
                                         type="size", options={"source_unit": "MB"})
-CST_INSTANCE_META.append_cst_meta_field(TextDyField, 'Volume', 'data.total_volume_size', auto_search=True, data_type=int,
+CST_INSTANCE_META.append_cst_meta_field(TextDyField, 'Volume Size', 'data.total_volume_size', auto_search=True,
+                                        data_type=int,
                                         type="size", options={"source_unit": "GB", "display_unit": "GB"}
                                         )
-CST_INSTANCE_META.append_cst_meta_field(TextDyField, 'Volume Count', 'data.volume_count', auto_search=True, data_type=int)
+CST_INSTANCE_META.append_cst_meta_field(TextDyField, 'Volume Count', 'data.volume_count', auto_search=True,
+                                        data_type=int)
 CST_INSTANCE_META.append_cst_meta_field(ListDyField, 'IP Address', 'data.addresses', auto_search=True,
                                         options={'delimiter': ', ', 'sub_key': 'addr'})
 CST_INSTANCE_META.append_cst_meta_field(TextDyField, 'Key Name', 'data.key_name', auto_search=True)
@@ -75,6 +80,11 @@ CST_INSTANCE_META.append_cst_meta_field(ListDyField, 'Security Groups', 'data.se
                                         options={'delimiter': ', ', 'sub_key': 'name'})
 CST_INSTANCE_META.append_cst_meta_field(TextDyField, 'Image Name', 'data.image_name', auto_search=True,
                                         associated_resource=True)
+CST_INSTANCE_META.append_cst_meta_field(BadgeDyField, 'Image ID', 'data.image_id',
+                                        reference={"resource_type": "inventory.CloudService",
+                                                   "reference_key": "reference.resource_id"},
+                                        options={'is_optional': True}
+                                        )
 CST_INSTANCE_META.append_cst_meta_field(TextDyField, 'Hypervisor Name', 'data.hypervisor_name', auto_search=True)
 CST_INSTANCE_META.append_cst_meta_field(BadgeDyField, 'Hypervisor ID', 'data.hypervisor_id', auto_search=True,
                                         reference={"resource_type": "inventory.CloudService",
@@ -122,10 +132,13 @@ CLOUD_SERVICE_TYPE._metadata = CloudServiceTypeMeta.set_meta(fields=CST_INSTANCE
                                                                  ChartWidget.set(
                                                                      **get_data_from_yaml(count_by_region_conf)),
                                                                  ChartWidget.set(
-                                                                     **get_data_from_yaml(total_vcpu_count_by_project_conf)),
+                                                                     **get_data_from_yaml(
+                                                                         total_vcpu_count_by_project_conf)),
                                                                  ChartWidget.set(
-                                                                     **get_data_from_yaml(total_memory_size_by_project_conf)),
+                                                                     **get_data_from_yaml(
+                                                                         total_memory_size_by_project_conf)),
                                                                  ChartWidget.set(
-                                                                     **get_data_from_yaml(total_volume_size_by_project_conf)),
+                                                                     **get_data_from_yaml(
+                                                                         total_volume_size_by_project_conf)),
                                                              ]
                                                              )

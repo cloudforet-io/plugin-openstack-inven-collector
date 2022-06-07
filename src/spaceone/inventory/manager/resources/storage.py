@@ -1,16 +1,14 @@
-from spaceone.inventory.conf.global_conf import get_logger
-
-from spaceone.inventory.manager.resources.resource import BaseResource
-from spaceone.inventory.model.resources.storage import StorageModel
-from spaceone.inventory.error.base import CollectorError
-from spaceone.inventory.manager.resources.metadata.cloud_service_type import storage as cst
-from spaceone.inventory.manager.resources.metadata.cloud_service import storage as cs
-
 from typing import (
     List,
-    Dict,
-    Any
+    Any,
 )
+
+from spaceone.inventory.conf.global_conf import get_logger
+from spaceone.inventory.error.base import CollectorError
+from spaceone.inventory.manager.resources.metadata.cloud_service import storage as cs
+from spaceone.inventory.manager.resources.metadata.cloud_service_type import storage as cst
+from spaceone.inventory.manager.resources.resource import BaseResource
+from spaceone.inventory.model.resources.storage import StorageModel
 
 _LOGGER = get_logger(__name__)
 

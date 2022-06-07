@@ -38,3 +38,15 @@ class VolumeQuotaModel(ResourceModel):
     volumes = IntType()
     usage = DictType(StringType, serialize_when_none=False)
     reservation = DictType(StringType, serialize_when_none=False)
+
+
+class SnapshotModel(ResourceModel):
+    name = StringType()
+    description = StringType()
+    created_at = DateTimeType()
+    is_forced = BooleanType(default=None)
+    metadata = DictType(StringType, default={})
+    size = FloatType(default=0)
+    size_gb = FloatType(default=0)
+    status = StringType()
+    volume_id = StringType()

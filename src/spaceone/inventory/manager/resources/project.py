@@ -1,13 +1,7 @@
-from spaceone.inventory.model.resources.project import ProjectModel
-from spaceone.inventory.manager.resources.resource import BaseResource
-from spaceone.inventory.manager.resources.metadata.cloud_service_type import project as cst
 from spaceone.inventory.manager.resources.metadata.cloud_service import project as cs
-
-from typing import (
-    List,
-    Dict,
-    Any
-)
+from spaceone.inventory.manager.resources.metadata.cloud_service_type import project as cst
+from spaceone.inventory.manager.resources.resource import BaseResource
+from spaceone.inventory.model.resources.project import ProjectModel
 
 
 class ProjectResource(BaseResource):
@@ -16,12 +10,12 @@ class ProjectResource(BaseResource):
     _resource = 'projects'
     _cloud_service_type_resource = cst.CLOUD_SERVICE_TYPE
     _cloud_service_meta = cs.CLOUD_SERVICE_METADATA
-    _resource_path = "/identity/"
+    _resource_path = "/identity"
     _native_all_projects_query_support = False
     _native_project_id_query_support = False
     _associated_resource_cls_list = ['ComputeQuotaResource', 'VolumeQuotaResource']
 
-    def _set_custom_model_obj_values(self, model_obj: ProjectModel, resource: Any):
+    def _set_custom_model_obj_values(self, model_obj: ProjectModel, resource: 'Resource'):
 
         quota_set_list = []
         project_id = resource.id

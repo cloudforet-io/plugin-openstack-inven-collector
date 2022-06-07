@@ -3,7 +3,8 @@ from spaceone.inventory.manager.resources.metadata.cloud_service_type.block_stor
 from spaceone.inventory.manager.resources.metadata.cloud_service_type.compute import CST_INSTANCE_META
 from spaceone.inventory.manager.resources.metadata.metaman import CSTMetaGenerator
 from spaceone.inventory.model.view.cloud_service import CloudServiceMeta
-from spaceone.inventory.model.view.dynamic_field import TextDyField
+from spaceone.inventory.model.view.dynamic_field import TextDyField, BadgeDyField, EnumDyField, ListDyField, \
+    DateTimeDyField
 from spaceone.inventory.model.view.dynamic_layout import ItemDynamicLayout, SimpleTableDynamicLayout, TableDynamicLayout
 
 CS_INSTANCE_META = CSTMetaGenerator(CST_INSTANCE_META)
@@ -36,3 +37,36 @@ CLOUD_SERVICE_INSTANCE_SG_RULES = TableDynamicLayout.set_fields('Security Groups
 CLOUD_SERVICE_METADATA = CloudServiceMeta.set_layouts(layouts=[CLOUD_SERVICE_BASE, CLOUD_SERVICE_INSTANCE_VOLUME,
                                                                CLOUD_SERVICE_INSTANCE_NIC,
                                                                CLOUD_SERVICE_INSTANCE_SG_RULES, ])
+
+# to use the cloud service of other resource
+CS_INSTANCES_META = CSTMetaGenerator()
+CS_INSTANCES_META.append_cst_meta_field(TextDyField, 'Name', 'name')
+CS_INSTANCES_META.append_cst_meta_field(TextDyField, 'Instance Name', 'instance_name')
+CS_INSTANCES_META.append_cst_meta_field(BadgeDyField, 'ID', 'id',
+                                        reference={"resource_type": "inventory.CloudService",
+                                                   "reference_key": "reference.resource_id"}, )
+CS_INSTANCES_META.append_cst_meta_field(EnumDyField, 'Status', 'status',
+                                        default_state={
+                                            'safe': ['ACTIVE'],
+                                            'available': ['BUILD', 'PAUSED'],
+                                            'warning': ['HARD_REBOOT', 'MIGRATING', 'PASSWORD', 'REBOOT',
+                                                        'REBUILD',
+                                                        'RESCUE', 'RESIZE', 'REVERT_RESIZE', 'SHELVED',
+                                                        'VERIFY_RESIZE'],
+                                            'disable': ['SOFT_DELETED', 'PAUSED', 'DELETED', 'SUSPENDED',
+                                                        'SHUTOFF'],
+                                            'alert': ['ERROR', 'UNKNOWN']}
+                                        )
+CS_INSTANCES_META.append_cst_meta_field(TextDyField, 'Flavor', 'flavor.name')
+CS_INSTANCES_META.append_cst_meta_field(TextDyField, 'vCpu', 'flavor.vcpus')
+CS_INSTANCES_META.append_cst_meta_field(TextDyField, 'Memory', 'flavor.ram', type="size",
+                                        options={"source_unit": "MB"})
+CS_INSTANCES_META.append_cst_meta_field(TextDyField, 'Disk Size', 'flavor.disk', type="size",
+                                        options={"source_unit": "GB", "display_unit": "GB"})
+CS_INSTANCES_META.append_cst_meta_field(ListDyField, 'IP Address', 'addresses.addr')
+CS_INSTANCES_META.append_cst_meta_field(TextDyField, 'Availability Zone', 'availability_zone')
+CS_INSTANCES_META.append_cst_meta_field(TextDyField, 'Host Name', 'hypervisor_name')
+CS_INSTANCES_META.append_cst_meta_field(TextDyField, 'Project Name', 'project_name')
+CS_INSTANCES_META.append_cst_meta_field(TextDyField, 'Project ID', 'project_id')
+CS_INSTANCES_META.append_cst_meta_field(DateTimeDyField, 'Created', 'created_at')
+CS_INSTANCES_META.append_cst_meta_field(DateTimeDyField, 'Updated', 'updated_at')

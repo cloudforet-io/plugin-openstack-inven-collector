@@ -4,7 +4,7 @@ from spaceone.inventory.libs.common_parser import get_data_from_yaml
 from spaceone.inventory.manager.resources.metadata.metaman import CSTMetaGenerator
 from spaceone.inventory.model.common.response import CloudServiceTypeResource
 from spaceone.inventory.model.view.cloud_service_type import CloudServiceTypeMeta
-from spaceone.inventory.model.view.dynamic_field import TextDyField, EnumDyField, BadgeDyField
+from spaceone.inventory.model.view.dynamic_field import TextDyField, EnumDyField
 from spaceone.inventory.model.view.dynamic_widget import ChartWidget, CardWidget
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -33,6 +33,8 @@ CST_COMPUTE_ZONE_META.append_cst_meta_field(TextDyField, 'Instances', 'data.tota
 CST_COMPUTE_ZONE_META.append_cst_meta_field(TextDyField, 'vCPU(total)', 'data.total_vcpus', auto_search=True,
                                             data_type=int)
 CST_COMPUTE_ZONE_META.append_cst_meta_field(TextDyField, 'vCPU(used)', 'data.total_vcpus_used', auto_search=True,
+                                            data_type=int)
+CST_COMPUTE_ZONE_META.append_cst_meta_field(TextDyField, 'vCPU(free)', 'data.total_vcpus_free', auto_search=True,
                                             data_type=int)
 CST_COMPUTE_ZONE_META.append_cst_meta_field(TextDyField, 'MEM(total)', 'data.total_memory_size', auto_search=True,
                                             data_type=int,

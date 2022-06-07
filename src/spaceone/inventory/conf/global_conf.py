@@ -1,8 +1,9 @@
 # Database Settings
 
+import json
 import logging
 import os
-import json
+
 from spaceone.inventory.error.base import CollectorError
 
 _LOGGER = logging.getLogger(__name__)

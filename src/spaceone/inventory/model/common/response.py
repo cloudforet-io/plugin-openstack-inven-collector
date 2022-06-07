@@ -36,7 +36,7 @@ class CloudServiceTypeResourceResponse(BaseResponse):
 
 class CloudServiceResponse(BaseResponse):
     match_rules = DictType(ListType(StringType), default={
-        '1': ['reference.resource_id', 'provider', 'cloud_service_type', 'cloud_service_group', 'account']
+        '1': ['reference.resource_id', 'provider', 'cloud_service_type', 'cloud_service_group']
     })
     resource_type = StringType(default='inventory.CloudService')
     resource = PolyModelType(CloudServiceResource)

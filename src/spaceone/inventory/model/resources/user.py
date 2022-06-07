@@ -1,5 +1,6 @@
+from schematics.types import ModelType, StringType, DateTimeType, BooleanType, DictType
+
 from spaceone.inventory.model.resources.base import ResourceModel
-from schematics.types import ModelType, ListType, StringType, IntType, DateTimeType, BooleanType, FloatType, DictType
 
 
 class UserModel(ResourceModel):

@@ -7,8 +7,8 @@ from spaceone.inventory.model.view.dynamic_layout import ItemDynamicLayout, Tabl
 CS_VOLUME_META = CSTMetaGenerator(CST_VOLUME_META)
 
 CS_VOLUME_META.insert_cst_meta_field('ID', TextDyField, 'Description', 'data.description')
-CS_VOLUME_META.insert_cst_meta_field('Size', TextDyField, 'Size', 'data.size', type="size",
-                                     options={"source_unit": "KB", "display_unit": "KB"})
+CS_VOLUME_META.insert_cst_meta_field('Size', TextDyField, 'Size (Bytes)', 'data.size', type="size",
+                                     options={"display_unit": "BYTES"})
 CS_VOLUME_META.append_cst_meta_field(TextDyField, 'Metadata', 'data.metadata')
 CS_VOLUME_META.append_cst_meta_field(TextDyField, 'selfLink', 'data.reference.self_link')
 CS_VOLUME_META.append_cst_meta_field(TextDyField, 'bookmarkLink', 'data.reference.bookmark_link')

@@ -16,9 +16,15 @@ OS_RESOURCE_MAP = {
     "VolumeQuotaResource": "spaceone.inventory.manager.resources.block_storage",
     "ComputeAZResource": "spaceone.inventory.manager.resources.compute",
     "StorageResource": "spaceone.inventory.manager.resources.storage",
+    "FloatingIPResource": "spaceone.inventory.manager.resources.network",
+    "RouterResource": "spaceone.inventory.manager.resources.network",
+    "ImageResource": "spaceone.inventory.manager.resources.image",
+    "SnapshotResource": "spaceone.inventory.manager.resources.block_storage",
+    "ServerGroupResource": "spaceone.inventory.manager.resources.compute",
+
 }
 
 # to do not show resources on spaceone view
-# Internally used for associated resources
+# Internally used as associated resources
 IGNORE_RESOURCE_LIST = ["RoleResource", "RoleAssignmentResource", "ShareNetworkResource", "ComputeQuotaResource",
                         "VolumeQuotaResource"]

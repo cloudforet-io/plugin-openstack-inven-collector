@@ -1,8 +1,8 @@
 from spaceone.inventory.manager.resources.metadata.cloud_service_type.storage import CST_STORAGE_META
 from spaceone.inventory.manager.resources.metadata.metaman import CSTMetaGenerator
 from spaceone.inventory.model.view.cloud_service import CloudServiceMeta
-from spaceone.inventory.model.view.dynamic_layout import ItemDynamicLayout, TableDynamicLayout
-from spaceone.inventory.model.view.dynamic_field import TextDyField, DateTimeDyField, ListDyField, EnumDyField, BadgeDyField
+from spaceone.inventory.model.view.dynamic_field import TextDyField
+from spaceone.inventory.model.view.dynamic_layout import ItemDynamicLayout
 
 CS_STORAGE_META = CSTMetaGenerator(CST_STORAGE_META)
 CS_STORAGE_META.insert_cst_meta_field('ID', TextDyField, 'Description', 'data.description')

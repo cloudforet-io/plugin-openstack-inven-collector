@@ -9,6 +9,7 @@ class ReferenceModel(Model):
     bookmark_link = StringType()
     self_link = StringType()
 
+
 class ResourceModel(Model):
     id = StringType(default=None, serialize_when_none=False)
     reference = ModelType(ReferenceModel, serialize_when_none=False)
@@ -17,6 +18,7 @@ class ResourceModel(Model):
     project_id = StringType(serialize_when_none=False)
     project_name = StringType(serialize_when_none=False)
     tags = ListType(StringType, default=[])
+
 
 class Secret(Model):
     username = StringType(required=True)
