@@ -1,6 +1,6 @@
 from openstack.network.v2.network import Network
 
-from spaceone.inventory.conf.global_conf import get_logger
+from spaceone.inventory.conf.settings import get_logger
 from spaceone.inventory.manager.resources.metadata.cloud_service import floating_ip as cs_floating_ip
 from spaceone.inventory.manager.resources.metadata.cloud_service import network as cs
 from spaceone.inventory.manager.resources.metadata.cloud_service import router as cs_router

@@ -1,6 +1,6 @@
 from openstack.compute.v2.hypervisor import Hypervisor
 
-from spaceone.inventory.conf.global_conf import get_logger
+from spaceone.inventory.conf.settings import get_logger
 from spaceone.inventory.manager.resources.metadata.cloud_service import hypervisor as cs
 from spaceone.inventory.manager.resources.metadata.cloud_service_type import hypervisor as cst
 from spaceone.inventory.manager.resources.resource import BaseResource

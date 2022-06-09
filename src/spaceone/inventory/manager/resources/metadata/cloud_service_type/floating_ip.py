@@ -21,7 +21,7 @@ CLOUD_SERVICE_TYPE.is_primary = False
 CLOUD_SERVICE_TYPE.is_major = False
 CLOUD_SERVICE_TYPE.service_code = 'OSFloatingIP'
 CLOUD_SERVICE_TYPE.tags = {
-    'spaceone:icon': 'https://wiki.openstack.org/w/images/2/2c/Nova-complete-300.svg',
+    'spaceone:icon': 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/cloud-services/openstack/openstack_network.svg',
     'spaceone:display_name': 'FloatingIP'
 }
 

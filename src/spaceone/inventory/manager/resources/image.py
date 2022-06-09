@@ -4,7 +4,7 @@ from typing import (
 
 from openstack.resource import Resource
 
-from spaceone.inventory.conf.global_conf import get_logger
+from spaceone.inventory.conf.settings import get_logger
 from spaceone.inventory.manager.resources.metadata.cloud_service import image as cs
 from spaceone.inventory.manager.resources.metadata.cloud_service_type import image as cst
 from spaceone.inventory.manager.resources.resource import BaseResource

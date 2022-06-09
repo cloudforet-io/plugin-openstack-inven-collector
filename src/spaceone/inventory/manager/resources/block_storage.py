@@ -1,6 +1,6 @@
 from openstack.block_storage.v2.volume import Volume
 
-from spaceone.inventory.conf.global_conf import get_logger
+from spaceone.inventory.conf.settings import get_logger
 from spaceone.inventory.manager.resources.metadata.cloud_service import block_storage as cs
 from spaceone.inventory.manager.resources.metadata.cloud_service import snapshot as cs_snapshot
 from spaceone.inventory.manager.resources.metadata.cloud_service_type import block_storage as cst

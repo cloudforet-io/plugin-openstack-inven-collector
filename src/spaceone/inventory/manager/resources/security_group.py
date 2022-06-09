@@ -1,6 +1,6 @@
 from openstack.network.v2.security_group import SecurityGroup
 
-from spaceone.inventory.conf.global_conf import get_logger
+from spaceone.inventory.conf.settings import get_logger
 from spaceone.inventory.manager.resources.metadata.cloud_service import security_group as cs
 from spaceone.inventory.manager.resources.metadata.cloud_service_type import security_group as cst
 from spaceone.inventory.manager.resources.resource import BaseResource
