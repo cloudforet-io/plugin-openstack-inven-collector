@@ -1,6 +1,6 @@
 from openstack.compute.v2.server import Server
 
-from spaceone.inventory.conf.global_conf import get_logger
+from spaceone.inventory.conf.settings import get_logger
 from spaceone.inventory.manager.resources.metadata.cloud_service import availability_zone as cs_az
 from spaceone.inventory.manager.resources.metadata.cloud_service import compute as cs
 from spaceone.inventory.manager.resources.metadata.cloud_service import server_group as cs_sg
@@ -99,7 +99,6 @@ class InstanceResource(BaseResource):
         if resource.get('flavor'):
 
             dic = resource.flavor
-            ram = dic.get('ram')
 
             if 'original_name' in dic:
                 dic['name'] = dic['original_name']

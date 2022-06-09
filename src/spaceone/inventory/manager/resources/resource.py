@@ -16,7 +16,7 @@ from openstack.connection import Connection
 from openstack.resource import Resource
 from schematics.types import DateTimeType
 
-from spaceone.inventory.conf.global_conf import get_logger
+from spaceone.inventory.conf.settings import get_logger
 from spaceone.inventory.error.base import CollectorError
 from spaceone.inventory.manager import resources
 from spaceone.inventory.model.common.response import CloudServiceTypeResource

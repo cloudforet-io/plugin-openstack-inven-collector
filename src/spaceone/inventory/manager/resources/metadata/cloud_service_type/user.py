@@ -21,7 +21,7 @@ CLOUD_SERVICE_TYPE.is_primary = True
 CLOUD_SERVICE_TYPE.is_major = True
 CLOUD_SERVICE_TYPE.service_code = 'OSUser'
 CLOUD_SERVICE_TYPE.tags = {
-    'spaceone:icon': 'https://wiki.openstack.org/wiki/File:Swift-complete-300.svg',
+    'spaceone:icon': 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/cloud-services/openstack/openstack_identity.svg',
     'spaceone:display_name': 'User'
 }
 

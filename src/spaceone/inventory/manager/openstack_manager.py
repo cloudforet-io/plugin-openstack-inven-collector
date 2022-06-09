@@ -13,7 +13,7 @@ import openstack
 from openstack.connection import Connection
 from spaceone.core.manager import BaseManager
 
-from spaceone.inventory.conf.global_conf import get_logger
+from spaceone.inventory.conf.settings import get_logger
 from spaceone.inventory.error.base import CollectorError
 from spaceone.inventory.manager import resources
 from spaceone.inventory.model.common.base import CloudServiceReferenceModel
