@@ -12,6 +12,7 @@ class ReferenceModel(Model):
 
 class ResourceModel(Model):
     id = StringType(default=None, serialize_when_none=False)
+    name = StringType()
     reference = ModelType(ReferenceModel, serialize_when_none=False)
     external_link = StringType()
     region_name = StringType()
@@ -31,5 +32,3 @@ class Secret(Model):
     identity_api_version = StringType(default="3")
     dashboard_url = StringType(default=None)
     all_projects = BooleanType(default=False)
-
-

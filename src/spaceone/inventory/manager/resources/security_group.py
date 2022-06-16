@@ -1,5 +1,3 @@
-from openstack.network.v2.security_group import SecurityGroup
-
 from spaceone.inventory.conf.settings import get_logger
 from spaceone.inventory.manager.resources.metadata.cloud_service import security_group as cs
 from spaceone.inventory.manager.resources.metadata.cloud_service_type import security_group as cst
@@ -9,22 +7,19 @@ from spaceone.inventory.model.resources.security_group import SecurityGroupRuleM
 
 _LOGGER = get_logger(__name__)
 
-from typing import (
-    Final,
-)
 
 class SecurityGroupResource(BaseResource):
     _model_cls = SecurityGroupModel
     _proxy = 'network'
     _resource = 'security_groups'
-    _is_admin_dashboard: Final[bool] = False
+    _is_admin_dashboard = False
     _resource_path = "/project/security_groups/{id}"
     _cloud_service_type_resource = cst.CLOUD_SERVICE_TYPE
     _cloud_service_meta = cs.CLOUD_SERVICE_METADATA
     _native_all_projects_query_support = False
     _native_project_id_query_support = True
 
-    def _set_custom_model_obj_values(self, model_obj: SecurityGroupModel, resource: SecurityGroup):
+    def _set_custom_model_obj_values(self, model_obj: SecurityGroupModel, resource):
 
         if resource.get('security_group_rules'):
             security_group_rules = resource.security_group_rules

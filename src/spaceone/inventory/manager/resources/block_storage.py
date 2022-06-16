@@ -1,5 +1,3 @@
-from openstack.block_storage.v2.volume import Volume
-
 from spaceone.inventory.conf.settings import get_logger
 from spaceone.inventory.manager.resources.metadata.cloud_service import block_storage as cs
 from spaceone.inventory.manager.resources.metadata.cloud_service import snapshot as cs_snapshot
@@ -23,7 +21,7 @@ class VolumeResource(BaseResource):
     _native_all_projects_query_support = True
     _native_project_id_query_support = True
 
-    def _set_custom_model_obj_values(self, model_obj: VolumeModel, resource: Volume):
+    def _set_custom_model_obj_values(self, model_obj: VolumeModel, resource):
 
         if resource.get('attachments') and isinstance(resource.attachments, list) and len(resource.attachments) > 1:
             self._set_obj_key_value(model_obj, 'multiattach', True)
@@ -58,12 +56,10 @@ class SnapshotResource(BaseResource):
     _native_all_projects_query_support = True
     _native_project_id_query_support = True
 
-    def __init__(self, conn, **kwargs):
-        super().__init__(conn, **kwargs)
-        self._default_args = (True,)
+    def __init__(self, conn, *args, **kwargs):
+        super().__init__(conn, True, **kwargs)
 
-    def _set_custom_model_obj_values(self, model_obj: VolumeModel, resource: Volume):
-
+    def _set_custom_model_obj_values(self, model_obj: VolumeModel, resource):
         if resource.get('size'):
             giga_to_byte = 1024 * 1024 * 1024
             self._set_obj_key_value(model_obj, 'size_gb', resource.size)

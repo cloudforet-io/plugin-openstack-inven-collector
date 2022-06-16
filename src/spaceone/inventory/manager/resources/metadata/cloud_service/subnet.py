@@ -10,4 +10,3 @@ CS_SUBNET_META.insert_cst_meta_field('ID', TextDyField, 'Description', 'data.des
 
 CLOUD_SERVICE_BASE = ItemDynamicLayout.set_fields('Subnet', fields=CS_SUBNET_META.fields)
 CLOUD_SERVICE_METADATA = CloudServiceMeta.set_layouts(layouts=[CLOUD_SERVICE_BASE])
-

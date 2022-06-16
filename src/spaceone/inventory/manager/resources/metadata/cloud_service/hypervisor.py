@@ -2,9 +2,11 @@ from spaceone.inventory.manager.resources.metadata.cloud_service.compute import 
 from spaceone.inventory.manager.resources.metadata.cloud_service_type.hypervisor import CST_HV_META
 from spaceone.inventory.manager.resources.metadata.metaman import CSTMetaGenerator
 from spaceone.inventory.model.view.cloud_service import CloudServiceMeta
+from spaceone.inventory.model.view.dynamic_field import DictDyField
 from spaceone.inventory.model.view.dynamic_layout import ItemDynamicLayout, TableDynamicLayout
 
 CS_HV_META = CSTMetaGenerator(CST_HV_META)
+CS_HV_META.insert_cst_meta_field('vCPU Model', DictDyField, 'vCPU Topology', 'data.cpu_info.topology')
 
 CLOUD_SERVICE_BASE = ItemDynamicLayout.set_fields('Hypervisor', fields=CS_HV_META.fields)
 

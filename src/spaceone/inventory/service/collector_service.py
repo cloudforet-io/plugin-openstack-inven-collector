@@ -3,20 +3,24 @@ import json
 import logging
 import time
 from typing import (
-
+    Iterator,
     List,
     Dict
 )
 
-from spaceone.core.service import *
+from spaceone.core.manager import BaseManager
+from spaceone.core.service import BaseService
+from spaceone.core.service import authentication_handler, transaction, check_required
 
-from spaceone.inventory import manager
+from spaceone.inventory import manager as Manager
 from spaceone.inventory.conf.cloud_service_conf import *
+from spaceone.inventory.model.common.response import BaseResponse
 from spaceone.inventory.model.common.response import ErrorResourceResponse
 
 __all__ = ['CollectorService']
 
 _LOGGER = logging.getLogger(__name__)
+
 
 @authentication_handler
 class CollectorService(BaseService):
@@ -26,8 +30,7 @@ class CollectorService(BaseService):
 
         self.execute_managers = []
 
-
-    #@check_required(['options'])
+    # @check_required(['options'])
     def init(self, params) -> Dict:
         """ init plugin by options
         """
@@ -41,7 +44,7 @@ class CollectorService(BaseService):
         return {'metadata': capability}
 
     @transaction
-    #@check_required(['options', 'secret_data'])
+    # @check_required(['options', 'secret_data'])
     def verify(self, params) -> Dict:
         """
         Args:
@@ -54,7 +57,7 @@ class CollectorService(BaseService):
 
     @transaction
     @check_required(['options', 'secret_data'])
-    def collect(self, params) -> Dict:
+    def collect(self, params) -> Iterator[BaseResponse]:
         """
         Args:
             params:
@@ -77,7 +80,6 @@ class CollectorService(BaseService):
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKER) as executor:
             future_executors = []
             for execute_manager in self.execute_managers:
-
                 _manager = self.locator.get_manager(execute_manager)
                 _LOGGER.debug(f'{_manager.__class__.__name__} module loaded')
                 future_executors.append(executor.submit(_manager.collect_resources, params))
@@ -94,8 +96,8 @@ class CollectorService(BaseService):
         _LOGGER.debug(f'TOTAL TIME : {time.time() - start_time} Seconds')
 
     @staticmethod
-    def _get_execute_managers(options) -> List['BaseManager']:
-        return manager.list_manager()
+    def _get_execute_managers(options) -> List[BaseManager]:
+        return Manager.list_manager()
 
     @staticmethod
     def generate_error_response(e, cloud_service_group, cloud_service_type) -> ErrorResourceResponse:

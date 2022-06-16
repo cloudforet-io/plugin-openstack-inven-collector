@@ -17,7 +17,7 @@ try:
         raise CollectorError("DEBUG_ENABLED ENV not set. Default log level is INFO")
     DEBUG_ENABLED = json.loads(OS_DEBUG_ENABLED.lower())
 except Exception as e:
-    _LOGGER.error(e)
+    _LOGGER.info(e)
 
 if DEBUG_ENABLED:
     DEFAULT_LOG_LEVEL = logging.DEBUG

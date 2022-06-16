@@ -1,9 +1,3 @@
-from typing import (
-    Final
-)
-
-from openstack.shared_file_system.v2.share import Share
-
 from spaceone.inventory.conf.settings import get_logger
 from spaceone.inventory.manager.resources.metadata.cloud_service import share as cs
 from spaceone.inventory.manager.resources.metadata.cloud_service_type import share as cst
@@ -25,11 +19,10 @@ class ShareResource(BaseResource):
     _native_project_id_query_support = True
     _associated_resource_cls_list = ['ShareNetworkResource']
 
-    def __init__(self, conn, **kwargs):
-        super().__init__(conn, **kwargs)
-        self._default_args = (True,)  # details=True
+    def __init__(self, conn, *args, **kwargs):
+        super().__init__(conn, True, **kwargs)  # details=True
 
-    def _set_custom_model_obj_values(self, model_obj: ShareModel, resource: Share):
+    def _set_custom_model_obj_values(self, model_obj: ShareModel, resource):
 
         if resource.get('size'):
             giga_to_byte = 1024 * 1024 * 1024
@@ -46,7 +39,7 @@ class ShareNetworkResource(BaseResource):
     _model_cls = ShareNetworkModel
     _proxy = 'share'
     _resource = 'share_networks'
-    _is_dashboard_auth_switch: Final[bool] = False
+    _is_dashboard_auth_switch = False
     _resource_path = "/admin/share_networks/{id}"
     _cloud_service_type_resource = CloudServiceTypeResource({"name": "ShareNetwork", "group": "Network"})
     _native_all_projects_query_support = True

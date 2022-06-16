@@ -12,4 +12,3 @@ class CloudServiceTypeMeta(BaseMetaData):
     def set_meta(cls, name='', fields=[], search=[], widget=[]):
         table_meta = MetaDataViewTable({'layout': QuerySearchTableDynamicLayout.set_fields(name, fields)})
         return cls({'view': MetaDataView({'table': table_meta, 'search': search, 'widget': widget})})
-

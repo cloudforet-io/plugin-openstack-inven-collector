@@ -13,10 +13,12 @@ class UserModel(ResourceModel):
     role = ModelType('RoleModel')
     password_expires_at = DateTimeType()
 
+
 class RoleModel(ResourceModel):
     name = StringType()
     description = StringType()
     domain_id = StringType()
+
 
 class RoleAssignmentModel(ResourceModel):
     role = DictType(StringType())

@@ -35,8 +35,10 @@ CST_FLOATING_IP_META.append_cst_meta_field(EnumDyField, 'Status', 'data.status',
                                                'safe': ['ACTIVE'],
                                                'disable': ['DOWN'],
                                                'alert': ['ERROR']})
-CST_FLOATING_IP_META.append_cst_meta_field(TextDyField, 'DNS Domain', 'data.dns_domain', auto_search=True)
-CST_FLOATING_IP_META.append_cst_meta_field(TextDyField, 'DNS Name', 'data.dns_name', auto_search=True)
+CST_FLOATING_IP_META.append_cst_meta_field(TextDyField, 'DNS Domain', 'data.dns_domain', auto_search=True,
+                                           options={'is_optional': True})
+CST_FLOATING_IP_META.append_cst_meta_field(TextDyField, 'DNS Name', 'data.dns_name', auto_search=True,
+                                           options={'is_optional': True})
 CST_FLOATING_IP_META.append_cst_meta_field(TextDyField, 'Floating Ip Address', 'data.floating_ip_address',
                                            auto_search=True)
 CST_FLOATING_IP_META.append_cst_meta_field(TextDyField, 'Fixed Ip Address', 'data.fixed_ip_address', auto_search=True)
@@ -49,7 +51,8 @@ CST_FLOATING_IP_META.append_cst_meta_field(BadgeDyField, 'Project ID', 'data.pro
                                            reference={"resource_type": "inventory.CloudService",
                                                       "reference_key": "reference.resource_id"},
                                            )
-CST_FLOATING_IP_META.append_cst_meta_field(TextDyField, 'QoS Policy ID', 'data.qos_policy_id', auto_search=True)
+CST_FLOATING_IP_META.append_cst_meta_field(TextDyField, 'QoS Policy ID', 'data.qos_policy_id', auto_search=True,
+                                           options={'is_optional': True})
 CST_FLOATING_IP_META.append_cst_meta_field(BadgeDyField, 'Route ID', 'data.router_id', auto_search=True,
                                            reference={"resource_type": "inventory.CloudService",
                                                       "reference_key": "reference.resource_id"},

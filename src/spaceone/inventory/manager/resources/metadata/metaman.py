@@ -2,6 +2,7 @@ import copy
 from typing import (
     List,
     Optional,
+    Type
 )
 
 from spaceone.inventory.model.view.dynamic_field import BaseDynamicField
@@ -10,8 +11,8 @@ from spaceone.inventory.model.view.dynamic_field import SearchField
 
 class CSTMeta:
 
-    def __init__(self, field_cls: BaseDynamicField, name: str, key: str, **kwargs):
-        self.field_cls = field_cls
+    def __init__(self, field_cls: Type[BaseDynamicField], name: str, key: str, **kwargs):
+        self.field_cls: Type[BaseDynamicField] = field_cls
         self.name: str = name
         self.key: str = key
         self.data_type = None
@@ -33,7 +34,10 @@ class CSTMeta:
             else:
                 self.search = SearchField.set(name=name, key=key)
 
-    def __eq__(self, name: str):
+    def __eq__(self, name: object):
+        if not isinstance(name, str):
+            raise NotImplementedError
+
         if name == self.name:
             return True
 
@@ -50,20 +54,20 @@ class CSTMetaGenerator:
             self.cst_meta_list = copy.copy(cst_meta_generator.cst_metas)
 
     @staticmethod
-    def _create_cst_meta(field_cls: BaseDynamicField, name: str, key: str, **kwargs) -> CSTMeta:
+    def _create_cst_meta(field_cls: Type[BaseDynamicField], name: str, key: str, **kwargs) -> CSTMeta:
         return CSTMeta(field_cls, name, key, **kwargs)
 
     def _get_cst_field_index(self, name: str) -> int:
         return self.cst_meta_list.index(name)
 
-    def insert_cst_meta_field(self, previous_field_name: str, field_cls: BaseDynamicField, name: str, key: str,
+    def insert_cst_meta_field(self, previous_field_name: str, field_cls: Type[BaseDynamicField], name: str, key: str,
                               **kwargs) -> None:
 
         cst_meta = self._create_cst_meta(field_cls, name, key, **kwargs)
         previous_field_index = self._get_cst_field_index(previous_field_name)
         self.cst_meta_list.insert(previous_field_index + 1, cst_meta)
 
-    def append_cst_meta_field(self, field_cls: BaseDynamicField, name: str, key: str, **kwargs) -> None:
+    def append_cst_meta_field(self, field_cls: Type[BaseDynamicField], name: str, key: str, **kwargs) -> None:
 
         cst_meta = self._create_cst_meta(field_cls, name, key, **kwargs)
         self.cst_meta_list.append(cst_meta)
@@ -107,7 +111,12 @@ class CSTMetaGenerator:
                 splited_key = key.split(".")
 
                 try:
-                    splited_key.remove(kwargs.get("ignore_root_path"))
+                    root_path = kwargs.get("ignore_root_path")
+
+                    if not isinstance(root_path, str):
+                        raise NotImplemented
+
+                    splited_key.remove(str(root_path))
                     key = ".".join(splited_key)
                 except ValueError:
                     pass

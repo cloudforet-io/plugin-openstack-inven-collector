@@ -44,7 +44,8 @@ CST_IMAGE_META.append_cst_meta_field(TextDyField, 'Disk Format', 'data.disk_form
 CST_IMAGE_META.append_cst_meta_field(TextDyField, 'Container Format', 'data.container_format', auto_search=True)
 CST_IMAGE_META.append_cst_meta_field(EnumDyField, 'Visibility', 'data.visibility', auto_search=True,
                                      default_badge={
-                                         'coral.600': ['public'], 'indigo.500': ['community'], 'peacock.500': ['shared'],
+                                         'coral.600': ['public'], 'indigo.500': ['community'],
+                                         'peacock.500': ['shared'],
                                          'violet.500': ['private']})
 CST_IMAGE_META.append_cst_meta_field(EnumDyField, 'Hidden', 'data.is_hidden', auto_search=True,
                                      default_badge={

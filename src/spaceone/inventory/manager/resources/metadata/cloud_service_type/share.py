@@ -15,7 +15,6 @@ count_by_project_conf = os.path.join(current_dir, 'widget/share/count_by_project
 count_by_region_conf = os.path.join(current_dir, 'widget/share/count_by_region.yml')
 count_by_type_conf = os.path.join(current_dir, 'widget/share/count_by_type.yml')
 
-
 CLOUD_SERVICE_TYPE = CloudServiceTypeResource()
 CLOUD_SERVICE_TYPE.provider = 'openstack'
 CLOUD_SERVICE_TYPE.name = 'Share'
@@ -37,7 +36,8 @@ CST_SHARE_META.append_cst_meta_field(TextDyField, 'ID', 'data.id', auto_search=T
                                      options={'is_optional': True})
 CST_SHARE_META.append_cst_meta_field(EnumDyField, 'Status', 'data.status', default_state={
     'available': ['available'],
-    'warning': ['creating', 'manage_starting','creating_from_snapshot', 'deleting', 'manage_starting','unmanage_starting',
+    'warning': ['creating', 'manage_starting', 'creating_from_snapshot', 'deleting', 'manage_starting',
+                'unmanage_starting',
                 'extending', 'shrinking', 'migrating', 'migrating_to', 'replication_change', 'reverting'],
     'disable': ['inactive', 'unmanaged', 'deleted'],
     'alert': ['error', 'error_deleting', 'manage_error', 'unmanage_error', 'extending_error', 'shrinking_error',
@@ -50,7 +50,7 @@ CST_SHARE_META.append_cst_meta_field(EnumDyField, 'Protocol', 'data.share_protoc
                                      default_badge={
                                          'coral.600': ['NFS'], 'indigo.500': ['CIFS'], 'peacock.500': ['GLUSTERFS'],
                                          'green.500': ['HDFS'], 'red.500': ['CEPHFS'],
-                                         'violet.500': ['MAPRFS'] })
+                                         'violet.500': ['MAPRFS']})
 CST_SHARE_META.append_cst_meta_field(TextDyField, 'Export', 'data.export_location', auto_search=True)
 CST_SHARE_META.append_cst_meta_field(TextDyField, 'Exports', 'data.export_locations', auto_search=True,
                                      options={'is_optional': True})

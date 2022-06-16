@@ -1,5 +1,3 @@
-from openstack.compute.v2.hypervisor import Hypervisor
-
 from spaceone.inventory.conf.settings import get_logger
 from spaceone.inventory.manager.resources.metadata.cloud_service import hypervisor as cs
 from spaceone.inventory.manager.resources.metadata.cloud_service_type import hypervisor as cst
@@ -20,24 +18,37 @@ class HypervisorResource(BaseResource):
     _native_project_id_query_support = False
     _associated_resource_cls_list = ['InstanceResource', 'ComputeAZResource']
 
-    def __init__(self, conn, **kwargs):
-        super().__init__(conn, **kwargs)
-        self._default_args = (True,)  # details=True
-        self._default_kwargs = {"with_servers": True}
+    def __init__(self, conn, *args, **kwargs):
+        super().__init__(conn, True, with_servers=True)
 
-    def _collect_associated_resource(self, **kwargs):
-        super()._collect_associated_resource(all_projects=True)
+    def _collect_associated_resource(self, *args, **kwargs):
 
-    def __free__(self, ratio, total, used):
+        for class_name in self._associated_resource_cls_list:
+
+            if class_name == 'InstanceResource':
+                associated_resource = self.get_resource_class(class_name)(self._conn, all_projects=True)
+            elif class_name == 'ComputeAZResource':
+                associated_resource = self.get_resource_class(class_name)(self._conn, )
+
+            if associated_resource:
+                _LOGGER.info(f"Collecting related resources : {associated_resource.resource_name}")
+
+            try:
+                for resource in associated_resource.collect():
+                    self._associated_resource_list.append(resource)
+            except Exception as e:
+                _LOGGER.error(e)
+                raise
+
+    def _get_free_space(self, ratio, total, used):
         return (ratio * total) - used
 
-    def __get_placement_info(self, hypervisor_id):
+    def __get_placement_info(self, hypervisor_id: str):
 
         inventories = self._conn.placement.get_resource_providers_inventories(hypervisor_id).get('inventories')
         usages = self._conn.placement.get_resource_providers_usages(hypervisor_id).get('usages')
 
         if inventories and usages:
-
             dic = {
                 "local_disk_size": inventories.get('DISK_GB').get('total'),
                 "local_disk_used": usages.get('DISK_GB'),
@@ -50,16 +61,17 @@ class HypervisorResource(BaseResource):
                 "vcpus_allocation_ratio": inventories.get('VCPU').get('allocation_ratio'),
             }
 
-            dic["local_disk_free"] = self.__free__(dic['local_disk_allocation_ratio'], dic['local_disk_size'],
-                                                   dic['local_disk_used'])
-            dic["memory_free"] = self.__free__(dic['memory_allocation_ratio'], dic['memory_size'], dic['memory_used'])
-            dic["vcpus_free"] = self.__free__(dic['vcpus_allocation_ratio'], dic['vcpus'], dic['vcpus_used'])
+            dic["local_disk_free"] = self._get_free_space(dic['local_disk_allocation_ratio'], dic['local_disk_size'],
+                                                          dic['local_disk_used'])
+            dic["memory_free"] = self._get_free_space(dic['memory_allocation_ratio'], dic['memory_size'],
+                                                      dic['memory_used'])
+            dic["vcpus_free"] = self._get_free_space(dic['vcpus_allocation_ratio'], dic['vcpus'], dic['vcpus_used'])
 
             return dic
 
         return None
 
-    def _set_custom_model_obj_values(self, model_obj: HypervisorModel, resource: Hypervisor):
+    def _set_custom_model_obj_values(self, model_obj: HypervisorModel, resource):
 
         placement_info = None
 
@@ -98,13 +110,14 @@ class HypervisorResource(BaseResource):
             instances = []
             servers = resource.get('servers')
 
-            for server in servers:
-                instance = self.get_resource_model_from_associated_resource('InstanceResource',
-                                                                            id=server.get("uuid"))
-                instances.append(instance)
+            if servers:
+                for server in servers:
+                    instance = self.get_resource_model_from_associated_resource('InstanceResource',
+                                                                                id=server.get("uuid"))
+                    instances.append(instance)
 
-            self._set_obj_key_value(model_obj, 'instances', instances)
-            self._set_obj_key_value(model_obj, 'running_vms', len(resource.servers))
+                self._set_obj_key_value(model_obj, 'instances', instances)
+                self._set_obj_key_value(model_obj, 'running_vms', len(resource.servers))
 
         compute_azs = self.get_resource_model_from_associated_resources('ComputeAZResource')
 

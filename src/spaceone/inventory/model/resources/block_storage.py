@@ -27,7 +27,6 @@ class VolumeModel(ResourceModel):
 
 
 class VolumeQuotaModel(ResourceModel):
-
     quota_type = StringType(default="Volume")
     backup_gigabyte = FloatType()
     backups = IntType()
