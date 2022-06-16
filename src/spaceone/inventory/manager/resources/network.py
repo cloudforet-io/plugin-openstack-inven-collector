@@ -1,5 +1,3 @@
-from openstack.network.v2.network import Network
-
 from spaceone.inventory.conf.settings import get_logger
 from spaceone.inventory.manager.resources.metadata.cloud_service import floating_ip as cs_floating_ip
 from spaceone.inventory.manager.resources.metadata.cloud_service import network as cs
@@ -41,7 +39,7 @@ class NetworkResource(BaseResource):
     _native_project_id_query_support = True
     _associated_resource_cls_list = ['SubnetResource']
 
-    def _set_custom_model_obj_values(self, model_obj: NetworkModel, resource: Network):
+    def _set_custom_model_obj_values(self, model_obj: NetworkModel, resource):
 
         if resource.get('subnet_ids'):
             subnet_ids = resource.subnet_ids
@@ -90,4 +88,3 @@ class RouterResource(BaseResource):
     _native_project_id_query_support = False
     _cloud_service_type_resource = cst_router.CLOUD_SERVICE_TYPE
     _cloud_service_meta = cs_router.CLOUD_SERVICE_METADATA
-

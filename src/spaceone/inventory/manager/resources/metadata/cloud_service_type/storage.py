@@ -16,7 +16,6 @@ volume_size_by_backend_name_conf = os.path.join(current_dir, 'widget/storage/vol
 count_by_region_conf = os.path.join(current_dir, 'widget/storage/count_by_region.yml')
 count_by_backend_name_conf = os.path.join(current_dir, 'widget/storage/count_by_backend_name.yml')
 
-
 CLOUD_SERVICE_TYPE = CloudServiceTypeResource()
 CLOUD_SERVICE_TYPE.provider = 'openstack'
 CLOUD_SERVICE_TYPE.name = 'Storage'
@@ -32,10 +31,11 @@ CLOUD_SERVICE_TYPE.tags = {
 
 CST_STORAGE_META = CSTMetaGenerator()
 
-CST_STORAGE_META.append_cst_meta_field(TextDyField, 'Name', 'data.name', options={'is_optional': True})
+CST_STORAGE_META.append_cst_meta_field(TextDyField, 'Name', 'data.name')
 CST_STORAGE_META.append_cst_meta_field(BadgeDyField, 'ID', 'data.id', auto_search=True,
                                        reference={"resource_type": "inventory.CloudService",
-                                                  "reference_key": "reference.resource_id"})
+                                                  "reference_key": "reference.resource_id"},
+                                       options={'is_optional': True})
 CST_STORAGE_META.append_cst_meta_field(TextDyField, 'Display Name', 'data.display_name', auto_search=True,
                                        options={'is_optional': True})
 CST_STORAGE_META.append_cst_meta_field(TextDyField, 'Namespace', 'data.namespace', auto_search=True,
@@ -65,7 +65,7 @@ CLOUD_SERVICE_TYPE._metadata = CloudServiceTypeMeta.set_meta(
     fields=CST_STORAGE_META.fields, search=CST_STORAGE_META.search,
     widget=[
         CardWidget.set(**get_data_from_yaml(total_count_conf)),
-        CardWidget.set(**get_data_from_yaml(total_volume_count_conf )),
+        CardWidget.set(**get_data_from_yaml(total_volume_count_conf)),
         CardWidget.set(**get_data_from_yaml(total_allocated_volume_size_conf)),
         ChartWidget.set(
             **get_data_from_yaml(count_by_region_conf)),

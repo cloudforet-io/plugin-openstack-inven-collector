@@ -49,7 +49,6 @@ class InstanceModel(ResourceModel):
 
 
 class ComputeQuotaModel(ResourceModel):
-
     quota_type = StringType(default="Compute")
     cores = DictType(StringType, serialize_when_none=False)
     fixed_ips = DictType(StringType, serialize_when_none=False)
@@ -69,7 +68,6 @@ class ComputeQuotaModel(ResourceModel):
 
 
 class ComputeAZModel(ResourceModel):
-
     name = StringType()
     hosts = DictType(StringType, default=None)
     state = DictType(StringType, serialize_when_none=False)
@@ -84,7 +82,6 @@ class ComputeAZModel(ResourceModel):
 
 
 class ServerGroupModel(ResourceModel):
-
     name = StringType()
     member_ids = ListType(StringType, default=None)
     metadata = DictType(StringType, serialize_when_none=False)
@@ -94,4 +91,3 @@ class ServerGroupModel(ResourceModel):
     rules = DictType(StringType, serialize_when_none=False)
     member_count = IntType()
     instances = ListType(ModelType(InstanceModel), serialize_when_none=False)
-

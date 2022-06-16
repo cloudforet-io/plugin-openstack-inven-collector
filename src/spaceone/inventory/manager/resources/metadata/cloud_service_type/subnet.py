@@ -29,19 +29,19 @@ CLOUD_SERVICE_TYPE.tags = {
 CST_SUBNET_META = CSTMetaGenerator()
 
 CST_SUBNET_META.append_cst_meta_field(TextDyField, 'Name', 'data.name', auto_search=True)
-CST_SUBNET_META.append_cst_meta_field(BadgeDyField, 'ID', 'data.id',  auto_search=True,
+CST_SUBNET_META.append_cst_meta_field(BadgeDyField, 'ID', 'data.id', auto_search=True,
                                       reference={"resource_type": "inventory.CloudService",
                                                  "reference_key": "reference.resource_id"})
 CST_SUBNET_META.append_cst_meta_field(EnumDyField, 'IP Version', 'data.ip_version', auto_search=True,
                                       default_badge={'coral.600': ['4'], 'indigo.500': ['6']})
-CST_SUBNET_META.append_cst_meta_field(EnumDyField, 'DHCP', 'data.is_dhcp_enabled',  auto_search=True,
+CST_SUBNET_META.append_cst_meta_field(EnumDyField, 'DHCP', 'data.is_dhcp_enabled', auto_search=True,
                                       default_badge={'peacock.600': ['true'], 'indigo.500': ['false']})
 CST_SUBNET_META.append_cst_meta_field(TextDyField, 'CIDR', 'data.cidr', auto_search=True)
 CST_SUBNET_META.append_cst_meta_field(ListDyField, 'IP Pools', 'data.allocation_pools', auto_search=True)
 CST_SUBNET_META.append_cst_meta_field(TextDyField, 'G/W', 'data.gateway_ip', auto_search=True)
 CST_SUBNET_META.append_cst_meta_field(ListDyField, 'Routes', 'data.host_routes', auto_search=True)
 CST_SUBNET_META.append_cst_meta_field(ListDyField, 'DNS', 'data.dns_nameservers', auto_search=True)
-CST_SUBNET_META.append_cst_meta_field(TextDyField, 'Segment ID', 'data.segment_id',  auto_search=True)
+CST_SUBNET_META.append_cst_meta_field(TextDyField, 'Segment ID', 'data.segment_id', auto_search=True)
 CST_SUBNET_META.append_cst_meta_field(DateTimeDyField, 'Created', 'data.created_at', auto_search=True)
 CST_SUBNET_META.append_cst_meta_field(DateTimeDyField, 'Updated', 'data.updated_at', auto_search=True)
 

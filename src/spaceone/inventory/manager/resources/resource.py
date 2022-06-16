@@ -1,13 +1,12 @@
 from typing import (
     Any,
     List,
-    Dict,
     Optional,
     Tuple,
     Iterator,
     Final,
     Generator,
-    Type
+    Type,
 )
 from urllib.parse import urljoin
 from urllib.parse import urlparse
@@ -30,39 +29,30 @@ DATETIME_KEYS: Final[List[str]] = ['attached_at', 'created_at', 'updated_at', 'l
 
 
 class BaseResource(object):
-    _model_cls: Any = ResourceModel
+    _model_cls: Type[ResourceModel] = ResourceModel
     _proxy: str = ""
     _resource: str = ""
     _cloud_service_type_resource: Optional[CloudServiceTypeResource] = None
     _cloud_service_meta: Optional[CloudServiceMeta] = None
-    _is_admin_dashboard: Final[bool] = True
-    _resource_path: Final[str] = ""
-    _associated_resource_cls_list: List['BaseResource'] = []
-    _native_all_projects_query_support: Final[bool] = False
-    _native_project_id_query_support: Final[bool] = False
-    _project_key: Final[str] = 'project_id'
+    _is_admin_dashboard: bool = True
+    _resource_path: str = ""
+    _associated_resource_cls_list: List[str] = []
+    _native_all_projects_query_support: bool = False
+    _native_project_id_query_support: bool = False
+    _project_key: str = 'project_id'
 
-    def __init__(self, conn: Connection, **kwargs):
+    def __init__(self, conn: Connection, *args, **kwargs):
         self._conn: Connection = conn
         self._dashboard_url: Optional[str] = None
         self._all_projects: bool = False
         self._associated_resource_list: List[Tuple[ResourceModel, 'BaseResource']] = []
-        self._projects: Dict[str] = {}
-        self._default_args: Tuple = ()
-        self._default_kwargs: Dict = {}
-        self.admin_project_id = None
-
-        if kwargs.get('default_args'):
-            self._default_args = kwargs.get('default_args')
-
-        if kwargs.get('default_kwargs'):
-            self._default_kwargs = kwargs.get('default_kwargs')
+        self._projects: dict = {}
+        self._default_args: tuple = args
+        self._default_kwargs: dict = kwargs
+        self._admin_project_id: Optional[str] = None
 
         if kwargs.get('all_projects'):
-            self._all_projects = kwargs.get('all_projects')
-
-        if kwargs.get('dashboard_url'):
-            self._dashboard_url = kwargs.get('dashboard_url')
+            self._all_projects = bool(kwargs.get('all_projects'))
 
         try:
             # for getting project name
@@ -70,28 +60,35 @@ class BaseResource(object):
                 self._projects[project.id] = {"name": project.name}
 
                 if project.name == 'admin':
-                    self.admin_project_id = project.id
+                    self._admin_project_id = project.id
 
         except Exception as e:
             _LOGGER.info(e)
 
-    def get_location_project_id(self, resource: Resource) -> str:
+    def get_location_project_id(self, resource: Resource) -> Optional[str]:
 
-        if resource.get("location") and resource.get("location").get("project") and \
-                resource.get("location").get("project").get("id"):
-            return resource.get("location").get("project").get("id")
+        location = resource.get("location")
+
+        if location and location.get("project"):
+            project = location.get("project")
+            if project and project.get('id'):
+                return location.get("project").get("id")
 
         return None
 
     @staticmethod
-    def get_resource_class(class_name: str):
+    def get_resource_class(class_name: str) -> 'BaseResource':
         module_name = resources.OS_RESOURCE_MAP[class_name]
         mod = __import__(module_name, fromlist=[module_name])
         cls = getattr(mod, class_name)
         return cls
 
     @property
-    def args(self):
+    def admin_project_id(self) -> Optional[str]:
+        return self._admin_project_id
+
+    @property
+    def args(self) -> tuple:
         return self._default_args
 
     @args.setter
@@ -111,11 +108,11 @@ class BaseResource(object):
         return self.__class__.__name__
 
     @property
-    def cloud_service_meta(self) -> CloudServiceMeta:
+    def cloud_service_meta(self) -> Optional[CloudServiceMeta]:
         return self._cloud_service_meta
 
     @property
-    def cloud_service_type_resource(self) -> CloudServiceTypeResource:
+    def cloud_service_type_resource(self) -> Optional[CloudServiceTypeResource]:
         return self._cloud_service_type_resource
 
     @property
@@ -131,15 +128,19 @@ class BaseResource(object):
         return ""
 
     @property
-    def dashboard_url(self) -> str:
+    def dashboard_url(self) -> Optional[str]:
         return self._dashboard_url
+
+    @dashboard_url.setter
+    def dashboard_url(self, value: str) -> None:
+        self._dashboard_url = value
 
     @property
     def resource_path(self) -> str:
         return self._resource_path
 
     @property
-    def resources(self) -> List[Any]:
+    def resources(self) -> List[Resource]:
 
         if self._conn is None:
             raise CollectorError(message='secret_data must exist')
@@ -158,7 +159,7 @@ class BaseResource(object):
                 if self._all_projects and not self._native_all_projects_query_support \
                         and self._native_project_id_query_support:
 
-                    resources_list = []
+                    resources_list: List[Resource] = []
 
                     for project_id in self._projects.keys():
                         kwargs[self._project_key] = project_id
@@ -180,22 +181,24 @@ class BaseResource(object):
         setattr(obj, key, value)
 
     # for sub class custom values
-    def _set_custom_model_obj_values(self, model_obj: ResourceModel, resource: Resource):
+    def _set_custom_model_obj_values(self, model_obj: ResourceModel, resource: Resource) -> None:
         pass
 
-    def __set_default_model_obj_project(self, model_obj: ResourceModel, resource: Resource):
+    def __set_default_model_obj_project(self, model_obj: ResourceModel, resource: Resource) -> None:
 
         if self._projects.get(resource.get('project_id'), None):
             project_id = resource.get('project_id')
             project_name = self._projects[project_id].get("name")
             self._set_obj_key_value(model_obj, 'project_name', project_name)
 
-    def __set_default_model_obj_location(self, model_obj: ResourceModel, resource: Resource):
+    def __set_default_model_obj_location(self, model_obj: ResourceModel, resource: Resource) -> None:
 
-        if resource.get('location') and resource.get('location').get('region_name'):
-            self._set_obj_key_value(model_obj, 'region_name', resource.get('location').get('region_name'))
+        location = resource.get('location')
 
-    def __set_default_model_obj_links(self, model_obj: ResourceModel, resource: Resource):
+        if location and location.get('region_name'):
+            self._set_obj_key_value(model_obj, 'region_name', location.get('region_name'))
+
+    def __set_default_model_obj_links(self, model_obj: ResourceModel, resource: Resource) -> None:
 
         if resource.get('links'):
 
@@ -242,7 +245,7 @@ class BaseResource(object):
             self._set_obj_key_value(model_obj, 'external_link', urljoin(base=external_base, url=external_url))
 
     @staticmethod
-    def urljoin(*args):
+    def urljoin(*args) -> str:
         return "/".join(map(lambda x: str(x).lstrip('/'), args))
 
     def get_resource_model_from_associated_resource(self, resource_cls_name: str, **kwargs) \
@@ -286,10 +289,10 @@ class BaseResource(object):
 
         return rtn_list
 
-    def _collect_associated_resource(self, **kwargs):
+    def _collect_associated_resource(self, *args, **kwargs) -> None:
 
         for class_name in self._associated_resource_cls_list:
-            associated_resource = self.get_resource_class(class_name)(self._conn, **kwargs)
+            associated_resource = self.get_resource_class(class_name)(self._conn, *args, **kwargs)
 
             if associated_resource:
                 _LOGGER.info(f"Collecting related resources : {associated_resource.resource_name}")
@@ -300,12 +303,11 @@ class BaseResource(object):
             try:
                 for resource in associated_resource.collect():
                     self._associated_resource_list.append(resource)
-
             except Exception as e:
                 _LOGGER.error(e)
                 raise
 
-    def _create_obj(self, model_cls: Type[ResourceModel], resource: Resource, **kwargs) -> (ResourceModel, Resource):
+    def _create_obj(self, model_cls: Type[ResourceModel], resource: Resource, **kwargs) -> ResourceModel:
 
         model_obj = model_cls()
 

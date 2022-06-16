@@ -7,4 +7,3 @@ class BaseDynamicSearch(Model):
     key = StringType()
     data_type = StringType(choices=['string', 'integer', 'float', 'boolean', 'datetime'],
                            serialize_when_none=False)
-

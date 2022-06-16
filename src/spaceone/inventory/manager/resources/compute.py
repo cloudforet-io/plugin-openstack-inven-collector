@@ -1,5 +1,3 @@
-from openstack.compute.v2.server import Server
-
 from spaceone.inventory.conf.settings import get_logger
 from spaceone.inventory.manager.resources.metadata.cloud_service import availability_zone as cs_az
 from spaceone.inventory.manager.resources.metadata.cloud_service import compute as cs
@@ -14,14 +12,9 @@ from spaceone.inventory.model.resources.compute import ComputeQuotaModel
 from spaceone.inventory.model.resources.compute import InstanceModel
 from spaceone.inventory.model.resources.compute import NicModel
 from spaceone.inventory.model.resources.compute import ServerGroupModel
-from spaceone.inventory.model.resources.hypervisor import HypervisorModel
 from spaceone.inventory.model.resources.security_group import SecurityGroupModel
 
 _LOGGER = get_logger(__name__)
-
-from typing import (
-    Final
-)
 
 
 class InstanceResource(BaseResource):
@@ -35,7 +28,7 @@ class InstanceResource(BaseResource):
     _native_project_id_query_support = True
     _associated_resource_cls_list = ['VolumeResource', 'SecurityGroupResource', 'HypervisorResource']
 
-    def _set_custom_model_obj_values(self, model_obj: InstanceModel, resource: Server):
+    def _set_custom_model_obj_values(self, model_obj: InstanceModel, resource):
 
         if resource.get('vm_state'):
             self._set_obj_key_value(model_obj, 'vm_state', str(resource.vm_state).upper())
@@ -75,7 +68,6 @@ class InstanceResource(BaseResource):
                         self._set_obj_key_value(model_obj, 'image_name',
                                                 volume.get('volume_image_metadata').get('image_name'))
                 else:
-                    total_volume_size = None
                     attached_volumes.append(VolumeModel({"id": attached_id}))
 
             self._set_obj_key_value(model_obj, 'volumes', attached_volumes)
@@ -138,11 +130,10 @@ class ComputeAZResource(BaseResource):
     _cloud_service_meta = cs_az.CLOUD_SERVICE_METADATA
     _associated_resource_cls_list = ['HypervisorResource']
 
-    def __init__(self, conn, **kwargs):
-        super().__init__(conn, **kwargs)
-        self._default_args = (True,)  # details=True
+    def __init__(self, conn, *args, **kwargs):
+        super().__init__(conn, True, **kwargs)  # details=True
 
-    def _set_custom_model_obj_values(self, model_obj: ComputeAZModel, resource: 'Resource'):
+    def _set_custom_model_obj_values(self, model_obj: ComputeAZModel, resource):
 
         # AZ does not have ID. So project id used for creating unique id
         location_project_id = self.get_location_project_id(resource)
@@ -156,7 +147,7 @@ class ComputeAZResource(BaseResource):
 
             if hosts:
 
-                hypervisors: HypervisorModel = self.get_resource_model_from_associated_resources('HypervisorResource')
+                hypervisors = self.get_resource_model_from_associated_resources('HypervisorResource')
                 hosts_list = []
 
                 total_running_vms = 0
@@ -205,7 +196,7 @@ class ServerGroupResource(BaseResource):
     _model_cls = ServerGroupModel
     _proxy = 'compute'
     _resource = 'server_groups'
-    _is_admin_dashboard: Final[bool] = False
+    _is_admin_dashboard = False
     _resource_path = "/ngdetails/OS::Nova::ServerGroup/{id}"
     _native_all_projects_query_support = True
     _native_project_id_query_support = True
@@ -213,18 +204,19 @@ class ServerGroupResource(BaseResource):
     _cloud_service_meta = cs_sg.CLOUD_SERVICE_METADATA
     _associated_resource_cls_list = ['InstanceResource']
 
-    def _set_custom_model_obj_values(self, model_obj: ServerGroupModel, resource: 'Resource'):
+    def _set_custom_model_obj_values(self, model_obj: ServerGroupModel, resource):
 
         if resource.get('member_ids'):
             instances = []
             member_ids = resource.get('member_ids')
 
+            if member_ids:
+                self._set_obj_key_value(model_obj, 'member_count', len(member_ids))
+
             for member_id in member_ids:
-                instance = self.get_resource_model_from_associated_resource('InstanceResource',
-                                                                            id=member_id)
-                instances.append(instance)
+                if member_id:
+                    instance = self.get_resource_model_from_associated_resource('InstanceResource',
+                                                                                id=member_id)
+                    instances.append(instance)
 
             self._set_obj_key_value(model_obj, 'instances', instances)
-            self._set_obj_key_value(model_obj, 'member_count', len(member_ids))
-
-        compute_azs = self.get_resource_model_from_associated_resources('ComputeAZResource')

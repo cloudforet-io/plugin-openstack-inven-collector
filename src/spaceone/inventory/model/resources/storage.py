@@ -4,7 +4,6 @@ from spaceone.inventory.model.resources.base import ResourceModel
 
 
 class StorageModel(ResourceModel):
-
     display_name = StringType()
     namespace = StringType()
     pool_name = StringType()
@@ -20,5 +19,3 @@ class StorageModel(ResourceModel):
     total_volume_count = IntType()
     attached_volume_count = IntType()
     available_volume_count = IntType()
-
-

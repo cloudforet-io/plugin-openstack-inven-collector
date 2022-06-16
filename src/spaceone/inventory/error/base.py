@@ -4,7 +4,6 @@ class CollectorError(Exception):
     """
 
     def __init__(self, message: str = None, cause: Exception = None) -> None:
-
         msg = message if message else ""
         if cause:
             self.cause = cause

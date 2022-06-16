@@ -34,7 +34,8 @@ CST_SNAPSHOT_META.append_cst_meta_field(EnumDyField, 'Status', 'data.status', au
                                         default_state={
                                             'safe': ['in-use'],
                                             'available': ['available', 'reserved'],
-                                            'warning': ['creating', 'backing-up', 'deleting', 'unmanaging', 'restoring'],
+                                            'warning': ['creating', 'backing-up', 'deleting', 'unmanaging',
+                                                        'restoring'],
                                             'disable': ['deleted'],
                                             'alert': ['error', 'error_deleting']
                                         })

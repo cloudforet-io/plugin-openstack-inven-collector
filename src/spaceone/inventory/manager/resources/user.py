@@ -1,7 +1,3 @@
-from typing import (
-    Any
-)
-
 from spaceone.inventory.manager.resources.metadata.cloud_service import user as cs
 from spaceone.inventory.manager.resources.metadata.cloud_service_type import user as cst
 from spaceone.inventory.manager.resources.resource import BaseResource
@@ -36,8 +32,10 @@ class UserResource(BaseResource):
 
         return None
 
-    def _set_custom_model_obj_values(self, model_obj: UserModel, resource: Any):
-        self._set_obj_key_value(model_obj, 'role', self._find_role(resource.id))
+    def _set_custom_model_obj_values(self, model_obj: UserModel, resource):
+
+        if resource.get('id'):
+            self._set_obj_key_value(model_obj, 'role', self._find_role(resource.id))
 
 
 class RoleResource(BaseResource):

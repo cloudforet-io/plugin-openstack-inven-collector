@@ -5,7 +5,6 @@ from spaceone.inventory.model.resources.base import ResourceModel
 
 
 class ImageModel(ResourceModel):
-
     name = StringType()
     disk_format = StringType()
     container_format = StringType()

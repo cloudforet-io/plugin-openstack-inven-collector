@@ -1,6 +1,6 @@
 from typing import (
     List,
-    Any,
+    Any
 )
 
 from spaceone.inventory.conf.settings import get_logger
@@ -53,13 +53,24 @@ class StorageResource(BaseResource):
 
         for host_name in dic_volumes.keys():
             capabilities = self._conn.block_storage.get_capabilities(host_name)
-            capabilities = capabilities.toDict()
 
-            capabilities['total_allocated_volume_size'] = dic_volumes.get(host_name).get('total_allocated_volume_size')
-            capabilities['total_volume_count'] = dic_volumes.get(host_name).get('total_volume_count')
-            capabilities['attached_volume_count'] = dic_volumes.get(host_name).get('attached_volume_count')
-            capabilities['available_volume_count'] = dic_volumes.get(host_name).get('available_volume_count')
+            if capabilities:
+                capabilities = capabilities.to_dict()
 
-            storage_backend_list.append(capabilities)
+            volume_info = dic_volumes.get(host_name)
+
+            if volume_info:
+                capabilities['total_allocated_volume_size'] = volume_info.get('total_allocated_volume_size')
+                capabilities['total_volume_count'] = volume_info.get('total_volume_count')
+                capabilities['attached_volume_count'] = volume_info.get('attached_volume_count')
+                capabilities['available_volume_count'] = volume_info.get('available_volume_count')
+
+                storage_backend_list.append(capabilities)
 
         return storage_backend_list
+
+    def _set_custom_model_obj_values(self, model_obj: StorageModel, resource):
+
+        if resource.get('id'):
+            # Storage hosts not have name, so the ID is considered as a name.
+            self._set_obj_key_value(model_obj, 'name', resource.get('id'))

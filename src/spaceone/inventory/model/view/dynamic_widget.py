@@ -34,7 +34,8 @@ class BaseDynamicWidgetQueryAggregateGroupFields(Model):
 
 class BaseDynamicWidgetQueryAggregateGroup(Model):
     keys = ListType(ModelType(BaseDynamicWidgetQueryAggregateGroupKeys), serialize_when_none=False)
-    _fields = ListType(ModelType(BaseDynamicWidgetQueryAggregateGroupFields), serialize_when_none=False, serialized_name='fields')
+    _fields = ListType(ModelType(BaseDynamicWidgetQueryAggregateGroupFields), serialize_when_none=False,
+                       serialized_name='fields')
 
 
 class BaseDynamicWidgetQueryAggregateCount(Model):
@@ -59,7 +60,8 @@ class BaseDynamicWidgetQueryAggregateProjectField(Model):
 
 
 class BaseDynamicWidgetQueryAggregateProject(Model):
-    _fields = ListType(ModelType(BaseDynamicWidgetQueryAggregateProjectField), serialize_when_none=False, serialized_name='fields')
+    _fields = ListType(ModelType(BaseDynamicWidgetQueryAggregateProjectField), serialize_when_none=False,
+                       serialized_name='fields')
 
 
 class BaseDynamicWidgetQueryAggregate(Model):

@@ -47,7 +47,6 @@ CST_USER_META.append_cst_meta_field(BadgeDyField, 'Default Project Id', 'data.de
                                                "reference_key": "reference.resource_id"})
 CST_USER_META.append_cst_meta_field(TextDyField, 'Domain ID', 'data.domain_id', auto_search=True)
 
-
 CLOUD_SERVICE_TYPE._metadata = CloudServiceTypeMeta.set_meta(
     fields=CST_USER_META.fields, search=CST_USER_META.search,
     widget=[

@@ -46,6 +46,8 @@ CST_NETWORK_META.append_cst_meta_field(ListDyField, 'CIDRs', 'data.cidrs', auto_
                                        options={'is_optional': True})
 CST_NETWORK_META.append_cst_meta_field(ListDyField, 'Subnet', 'data.minimal_subnets', auto_search=True)
 CST_NETWORK_META.append_cst_meta_field(ListDyField, 'Subnet ids', 'data.subnets.id', auto_search=True,
+                                       reference={"resource_type": "inventory.CloudService",
+                                                  "reference_key": "reference.resource_id"},
                                        options={'is_optional': True})
 CST_NETWORK_META.append_cst_meta_field(TextDyField, 'MTU', 'data.mtu', auto_search=True)
 CST_NETWORK_META.append_cst_meta_field(EnumDyField, 'Shared', 'data.is_shared', auto_search=True,
@@ -77,8 +79,8 @@ CST_NETWORK_META.append_cst_meta_field(DateTimeDyField, 'Updated', 'data.created
 CLOUD_SERVICE_TYPE._metadata = CloudServiceTypeMeta.set_meta(
     fields=CST_NETWORK_META.fields, search=CST_NETWORK_META.search,
     widget=[
-            CardWidget.set(**get_data_from_yaml(total_count_conf)),
-            ChartWidget.set(
-                **get_data_from_yaml(count_by_region_conf))
-            ]
+        CardWidget.set(**get_data_from_yaml(total_count_conf)),
+        ChartWidget.set(
+            **get_data_from_yaml(count_by_region_conf))
+    ]
 )

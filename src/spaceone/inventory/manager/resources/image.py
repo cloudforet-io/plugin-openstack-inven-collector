@@ -1,9 +1,3 @@
-from typing import (
-    Final
-)
-
-from openstack.resource import Resource
-
 from spaceone.inventory.conf.settings import get_logger
 from spaceone.inventory.manager.resources.metadata.cloud_service import image as cs
 from spaceone.inventory.manager.resources.metadata.cloud_service_type import image as cst
@@ -17,12 +11,12 @@ class ImageResource(BaseResource):
     _model_cls = ImageModel
     _proxy = 'image'
     _resource = 'images'
-    _is_admin_dashboard: Final[bool] = False
+    _is_admin_dashboard = False
     _resource_path = "/ngdetails/OS::Glance::Image/{id}"
     _cloud_service_type_resource = cst.CLOUD_SERVICE_TYPE
     _cloud_service_meta = cs.CLOUD_SERVICE_METADATA
 
-    def _set_custom_model_obj_values(self, model_obj: ImageModel, resource: Resource):
+    def _set_custom_model_obj_values(self, model_obj: ImageModel, resource):
 
         if resource.get('status'):
             self._set_obj_key_value(model_obj, 'status', str(resource.status).upper())

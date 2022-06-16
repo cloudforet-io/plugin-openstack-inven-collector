@@ -7,8 +7,6 @@ from spaceone.inventory.model.view.dynamic_layout import ItemDynamicLayout
 CS_FLOATING_IP_META = CSTMetaGenerator(CST_FLOATING_IP_META)
 CS_FLOATING_IP_META.insert_cst_meta_field('ID', TextDyField, 'Description', 'data.description')
 
-
-
 CLOUD_SERVICE_BASE = ItemDynamicLayout.set_fields('Floating IP', fields=CS_FLOATING_IP_META.fields)
 
 CLOUD_SERVICE_METADATA = CloudServiceMeta.set_layouts(layouts=[CLOUD_SERVICE_BASE])

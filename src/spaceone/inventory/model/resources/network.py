@@ -5,7 +5,6 @@ from spaceone.inventory.model.resources.base import ResourceModel
 
 
 class NetworkModel(ResourceModel):
-
     id = StringType()
     name = StringType()
     description = StringType()
@@ -28,8 +27,8 @@ class NetworkModel(ResourceModel):
     subnets = ListType(ModelType('SubnetModel'), default=[])
     minimal_subnets = ListType(StringType(), default=[])
 
-class SubnetModel(ResourceModel):
 
+class SubnetModel(ResourceModel):
     id = StringType()
     name = StringType()
     description = StringType()
@@ -44,6 +43,7 @@ class SubnetModel(ResourceModel):
     segment_id = StringType()
     created_at = DateTimeType()
     updated_at = DateTimeType()
+
 
 class SegmentModel(ResourceModel):
     id = StringType()

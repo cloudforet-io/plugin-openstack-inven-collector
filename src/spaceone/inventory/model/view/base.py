@@ -36,6 +36,7 @@ class BaseResponse(Model):
 class ReferenceModel(Model):
     class Option:
         serialize_when_none = False
+
     resource_id = StringType(required=False, serialize_when_none=False)
     external_link = StringType(required=False, serialize_when_none=False)
 
@@ -44,6 +45,8 @@ class ReferenceModel(Model):
 Schematic 방식으로 ServerMetadata를 처리하고 난 후에는 삭제 해도 됨
 일시적으로 넣어둠
 '''
+
+
 class ServerMetadata(Model):
     view = ModelType(MetaDataView)
 

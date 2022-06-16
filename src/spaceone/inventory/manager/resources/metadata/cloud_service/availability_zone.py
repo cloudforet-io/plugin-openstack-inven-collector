@@ -12,7 +12,7 @@ CS_COMPUTE_ZONE_HV_META = CSTMetaGenerator(CST_HV_META)
 CS_COMPUTE_ZONE_HV_META.delete_cst_meta_field("Availability Zone")
 
 CLOUD_SERVICE_HYPERVISOR = TableDynamicLayout.set_fields('Hypervisors', fields=CS_COMPUTE_ZONE_HV_META.get_table_fields(
-                                                         ignore_root_path='data'),
+    ignore_root_path='data'),
                                                          root_path="data.hypervisors")
 
 CLOUD_SERVICE_METADATA = CloudServiceMeta.set_layouts(layouts=[CLOUD_SERVICE_BASE, CLOUD_SERVICE_HYPERVISOR])
