@@ -16,6 +16,11 @@ from spaceone.inventory.model.resources.security_group import SecurityGroupModel
 
 _LOGGER = get_logger(__name__)
 
+INSERVICE = ['ACTIVE', 'BUILD', 'RESCUED', 'RESIZED', 'SHELVED', 'SHELVED_OFFLOADED']
+MAINTENANCE = ['BUILDING']
+CLOSED = ['PAUSED', 'SOFT_DELETED', 'STOPPED', 'SUSPENDED', 'ERROR']
+DELETED = ['DELETED']
+
 
 class InstanceResource(BaseResource):
     _model_cls = InstanceModel
@@ -107,6 +112,122 @@ class InstanceResource(BaseResource):
 
             if hypervisor:
                 self._set_obj_key_value(model_obj, 'hypervisor_id', hypervisor.id)
+
+        if not self.is_associated_resource:
+            self._set_standard_server_schema(model_obj, resource)
+
+        _LOGGER.debug(model_obj.to_primitive())
+
+    def _set_standard_server_schema(self, model_obj: InstanceModel, resource):
+
+        _LOGGER.debug(f"Updating standard server schema")
+
+        if resource.get('addresses'):
+
+            index = 0
+            ip_addresses = []
+            nics = []
+            addresses = resource.addresses
+
+            for network_name, network_values in addresses.items():
+                for network_value in network_values:
+                    nic = {'device_index': index, 'mac_address': network_value.get("OS-EXT-IPS-MAC:mac_addr"),
+                           'ip_addresses': network_value.get("addr")}
+
+                    nics.append(nic)
+
+                    if network_value.get("addr"):
+                        ip_addresses.append(network_value.get("addr"))
+
+                    index += 1
+
+            self._set_obj_key_value(model_obj, 'nics', nics)
+            self._set_obj_key_value(model_obj, 'ip_addresses', ip_addresses)
+
+            if ip_addresses:
+                self._set_obj_key_value(model_obj, 'primary_ip_address', ip_addresses[0])
+
+        if model_obj.volumes:
+            index = 0
+            disks = []
+
+            for volume in model_obj.volumes:
+
+                if volume:
+                    disk = {'device_index': index, 'disk_type': volume.volume_type, 'size': volume.size_gb}
+                    devices = []
+
+                    if volume.attachments:
+                        for attachment in volume.attachments:
+                            if attachment.get('device'):
+                                devices.append(attachment.get('device'))
+
+                        if devices:
+                            disk['device'] = ','.join(devices)
+
+                    disks.append(disk)
+
+            self._set_obj_key_value(model_obj, 'disks', disks)
+
+        compute = {'keypair': resource.get('key_name'), 'az': resource.get('availability_zone'),
+                   'instance_id': resource.get('id'), 'instance_name': resource.get('name'),
+                   'image': model_obj.image_name, 'launched_at': resource.get('created_at')}
+
+        if resource.get('flavor'):
+            flavor = resource.flavor
+            hardware = {'core': flavor.get("vcpus"), 'memory': flavor.get("ram")}
+            instance_type = flavor.get("name")
+
+            self._set_obj_key_value(model_obj, 'hardware', hardware)
+
+            if flavor.get("vcpus"):
+                self._set_obj_key_value(model_obj, 'size', int(flavor.get("vcpus")))
+
+            compute['instance_type'] = instance_type
+
+        if resource.get('vm_state'):
+            vm_state = str(resource.vm_state).upper()
+
+            if vm_state in INSERVICE:
+                compute['instance_state'] = 'INSERVICE'
+            elif vm_state in MAINTENANCE:
+                compute['instance_state'] = 'MAINTENANCE'
+            elif vm_state in CLOSED:
+                compute['instance_state'] = 'CLOSED'
+            elif vm_state in DELETED:
+                compute['instance_state'] = 'DELETED'
+
+        if resource.get('security_groups'):
+            security_groups = list(dic['name'] for dic in resource.security_groups)
+            compute['security_groups'] = security_groups
+
+        self._set_obj_key_value(model_obj, 'compute', compute)
+
+        if model_obj.security_group_rules:
+            security_group = []
+            security_group_rules = model_obj.security_group_rules
+            for security_group_rule in security_group_rules:
+                dic = {
+                    "protocol": security_group_rule.protocol,
+                    "remote_cidr": security_group_rule.remote_ip_prefix,
+                    "security_group_name": security_group_rule.security_group_name,
+                    "security_group_id": security_group_rule.security_group_id,
+                    "port_range_min": security_group_rule.port_range_min,
+                    "port_range_max": security_group_rule.port_range_max,
+                }
+
+                if security_group_rule.direction == 'ingress':
+                    dic['direction'] = 'inbound'
+
+                elif security_group_rule.direction == 'egress':
+                    dic['direction'] = 'outbound'
+
+                # openstack SG support allow only
+                dic['action'] = 'allow'
+
+                security_group.append(dic)
+
+            self._set_obj_key_value(model_obj, 'security_group', security_group)
 
 
 class ComputeQuotaResource(BaseResource):

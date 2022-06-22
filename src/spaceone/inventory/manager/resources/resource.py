@@ -50,6 +50,7 @@ class BaseResource(object):
         self._default_args: tuple = args
         self._default_kwargs: dict = kwargs
         self._admin_project_id: Optional[str] = None
+        self._is_associated_resource: bool = False
 
         if kwargs.get('all_projects'):
             self._all_projects = bool(kwargs.get('all_projects'))
@@ -77,7 +78,7 @@ class BaseResource(object):
         return None
 
     @staticmethod
-    def get_resource_class(class_name: str) -> 'BaseResource':
+    def get_resource_class(class_name: str) -> Type['BaseResource']:
         module_name = resources.OS_RESOURCE_MAP[class_name]
         mod = __import__(module_name, fromlist=[module_name])
         cls = getattr(mod, class_name)
@@ -86,6 +87,15 @@ class BaseResource(object):
     @property
     def admin_project_id(self) -> Optional[str]:
         return self._admin_project_id
+
+    @property
+    def is_associated_resource(self) -> bool:
+        return self._is_associated_resource
+
+    @is_associated_resource.setter
+    def is_associated_resource(self, value: bool) -> None:
+        self._is_associated_resource = value
+
 
     @property
     def args(self) -> tuple:
@@ -293,6 +303,7 @@ class BaseResource(object):
 
         for class_name in self._associated_resource_cls_list:
             associated_resource = self.get_resource_class(class_name)(self._conn, *args, **kwargs)
+            associated_resource.is_associated_resource = True
 
             if associated_resource:
                 _LOGGER.info(f"Collecting related resources : {associated_resource.resource_name}")

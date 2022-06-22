@@ -27,6 +27,7 @@ class Secret(Model):
     project_id = StringType(required=True)
     user_domain_name = StringType(required=True, default="Default")
     region_name = StringType(required=True, default="RegionOne")
+    region_code = StringType(required=False, serialize_when_none=False)
     auth_url = StringType(required=True)
     interface = StringType(default="public")
     identity_api_version = StringType(default="3")

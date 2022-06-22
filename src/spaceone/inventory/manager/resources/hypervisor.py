@@ -30,6 +30,8 @@ class HypervisorResource(BaseResource):
             elif class_name == 'ComputeAZResource':
                 associated_resource = self.get_resource_class(class_name)(self._conn, )
 
+            associated_resource.is_associated_resource = True
+
             if associated_resource:
                 _LOGGER.info(f"Collecting related resources : {associated_resource.resource_name}")
 

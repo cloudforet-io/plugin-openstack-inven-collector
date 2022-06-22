@@ -4,8 +4,6 @@ from spaceone.inventory.libs.common_parser import get_data_from_yaml
 from spaceone.inventory.manager.resources.metadata.metaman import CSTMetaGenerator
 from spaceone.inventory.model.common.response import CloudServiceTypeResource
 from spaceone.inventory.model.view.cloud_service_type import CloudServiceTypeMeta
-from spaceone.inventory.model.view.dynamic_field import TextDyField, EnumDyField, DateTimeDyField, ListDyField, \
-    BadgeDyField
 from spaceone.inventory.model.view.dynamic_widget import ChartWidget, CardWidget
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -30,12 +28,8 @@ CLOUD_SERVICE_TYPE.tags = {
 }
 
 CST_VOLUME_META = CSTMetaGenerator()
-CST_VOLUME_META.append_cst_meta_field(TextDyField, 'Name', 'data.name')
-CST_VOLUME_META.append_cst_meta_field(BadgeDyField, 'ID', 'data.id', auto_search=True,
-                                      reference={"resource_type": "inventory.CloudService",
-                                                 "reference_key": "reference.resource_id"},
-                                      options={'is_optional': True})
-CST_VOLUME_META.append_cst_meta_field(EnumDyField, 'Status', 'data.status', auto_search=True,
+
+CST_VOLUME_META.append_cst_meta_field('EnumDyField', 'Status', 'data.status', auto_search=True,
                                       default_state={
                                           'safe': ['in-use'],
                                           'available': ['available', 'reserved'],
@@ -47,50 +41,50 @@ CST_VOLUME_META.append_cst_meta_field(EnumDyField, 'Status', 'data.status', auto
                                           'alert': ['error', 'error_deleting', 'error_backing-up', 'error_restoring',
                                                     'error_extending', '']
                                       })
-CST_VOLUME_META.append_cst_meta_field(TextDyField, 'Size', 'data.size_gb', data_type=int, auto_search=True,
+CST_VOLUME_META.append_cst_meta_field('TextDyField', 'Size', 'data.size_gb', data_type=int, auto_search=True,
                                       type="size", options={"source_unit": "GB"})
-CST_VOLUME_META.append_cst_meta_field(TextDyField, 'Image Name', 'data.volume_image_metadata.image_name',
+CST_VOLUME_META.append_cst_meta_field('TextDyField', 'Image Name', 'data.volume_image_metadata.image_name',
                                       auto_search=True)
-CST_VOLUME_META.append_cst_meta_field(BadgeDyField, 'Image ID', 'data.volume_image_metadata.image_id',
+CST_VOLUME_META.append_cst_meta_field('BadgeDyField', 'Image ID', 'data.volume_image_metadata.image_id',
                                       auto_search=True,
                                       reference={"resource_type": "inventory.CloudService",
                                                  "reference_key": "reference.resource_id"},
                                       options={'is_optional': True})
-CST_VOLUME_META.append_cst_meta_field(TextDyField, 'Type', 'data.volume_type', auto_search=True)
-CST_VOLUME_META.append_cst_meta_field(EnumDyField, 'Bootable', 'data.is_bootable', auto_search=True,
+CST_VOLUME_META.append_cst_meta_field('TextDyField', 'Type', 'data.volume_type', auto_search=True)
+CST_VOLUME_META.append_cst_meta_field('EnumDyField', 'Bootable', 'data.is_bootable', auto_search=True,
                                       default_badge={
                                           'indigo.500': ['true'], 'coral.600': ['false']})
-CST_VOLUME_META.append_cst_meta_field(EnumDyField, 'Multi attach', 'data.multiattach', auto_search=True,
+CST_VOLUME_META.append_cst_meta_field('EnumDyField', 'Multi attach', 'data.multiattach', auto_search=True,
                                       default_badge={
                                           'indigo.500': ['true'], 'coral.600': ['false']
                                       })
-CST_VOLUME_META.append_cst_meta_field(EnumDyField, 'Encrypted', 'data.is_encrypted',
+CST_VOLUME_META.append_cst_meta_field('EnumDyField', 'Encrypted', 'data.is_encrypted', auto_search=True,
                                       default_badge={'indigo.500': ['true'], 'coral.600': ['false']})
-CST_VOLUME_META.append_cst_meta_field(ListDyField, 'Attached Instances', 'data.attachments', auto_search=True,
+CST_VOLUME_META.append_cst_meta_field('ListDyField', 'Attached Instance ID', 'data.attachments', auto_search=True,
                                       reference={"resource_type": "inventory.CloudService",
                                                  "reference_key": "reference.resource_id"},
                                       default_badge={"type": "reference", 'delimiter': ' ', 'sub_key': 'server_id'}
                                       )
-CST_VOLUME_META.append_cst_meta_field(ListDyField, 'Device', 'data.attachments.device', auto_search=True)
-CST_VOLUME_META.append_cst_meta_field(TextDyField, 'Availability Zone', 'data.availability_zone', auto_search=True)
-CST_VOLUME_META.append_cst_meta_field(BadgeDyField, 'Snapshot ID', 'data.snapshot_id', auto_search=True,
+CST_VOLUME_META.append_cst_meta_field('ListDyField', 'Device', 'data.attachments.device', auto_search=True)
+CST_VOLUME_META.append_cst_meta_field('TextDyField', 'Availability Zone', 'data.availability_zone', auto_search=True)
+CST_VOLUME_META.append_cst_meta_field('BadgeDyField', 'Snapshot ID', 'data.snapshot_id', auto_search=True,
                                       reference={"resource_type": "inventory.CloudService",
                                                  "reference_key": "reference.resource_id"},
                                       options={'is_optional': True})
-CST_VOLUME_META.append_cst_meta_field(BadgeDyField, 'Source Volume ID', 'data.source_volume_id', auto_search=True,
+CST_VOLUME_META.append_cst_meta_field('BadgeDyField', 'Source Volume ID', 'data.source_volume_id', auto_search=True,
                                       reference={"resource_type": "inventory.CloudService",
                                                  "reference_key": "reference.resource_id"},
                                       options={'is_optional': True})
-CST_VOLUME_META.append_cst_meta_field(BadgeDyField, 'Storage', 'data.host', auto_search=True,
+CST_VOLUME_META.append_cst_meta_field('BadgeDyField', 'Storage', 'data.host', auto_search=True,
                                       reference={"resource_type": "inventory.CloudService",
                                                  "reference_key": "reference.resource_id"},
                                       options={'is_optional': True})
-CST_VOLUME_META.append_cst_meta_field(TextDyField, 'Project Name', 'data.project_name', auto_search=True)
-CST_VOLUME_META.append_cst_meta_field(BadgeDyField, 'Project ID', 'data.project_id', auto_search=True,
+CST_VOLUME_META.append_cst_meta_field('TextDyField', 'Project Name', 'data.project_name', auto_search=True)
+CST_VOLUME_META.append_cst_meta_field('BadgeDyField', 'Project ID', 'data.project_id', auto_search=True,
                                       reference={"resource_type": "inventory.CloudService",
                                                  "reference_key": "reference.resource_id"},
                                       options={'is_optional': True})
-CST_VOLUME_META.append_cst_meta_field(DateTimeDyField, 'Created', 'data.created_at', auto_search=True)
+CST_VOLUME_META.append_cst_meta_field('DateTimeDyField', 'Created', 'data.created_at', auto_search=True)
 
 CLOUD_SERVICE_TYPE._metadata = CloudServiceTypeMeta.set_meta(
     fields=CST_VOLUME_META.fields, search=CST_VOLUME_META.search,
