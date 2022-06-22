@@ -193,7 +193,11 @@ class InstanceResource(BaseResource):
 
         if resource.get('flavor'):
             flavor = resource.flavor
-            hardware = {'core': flavor.get("vcpus"), 'memory': flavor.get("ram")}
+            hardware = {'core': flavor.get("vcpus")}
+
+            if flavor.get("ram"):
+                hardware['memory'] = round(flavor.get("ram") / 1024, 3)
+
             instance_type = flavor.get("name")
 
             self._set_obj_key_value(model_obj, 'hardware', hardware)
