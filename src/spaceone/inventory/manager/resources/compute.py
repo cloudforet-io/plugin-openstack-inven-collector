@@ -16,10 +16,20 @@ from spaceone.inventory.model.resources.security_group import SecurityGroupModel
 
 _LOGGER = get_logger(__name__)
 
-INSERVICE = ['ACTIVE', 'BUILD', 'RESCUED', 'RESIZED', 'SHELVED', 'SHELVED_OFFLOADED']
-MAINTENANCE = ['BUILDING']
-CLOSED = ['PAUSED', 'SOFT_DELETED', 'STOPPED', 'SUSPENDED', 'ERROR']
-DELETED = ['DELETED']
+PENDING = ['ERROR']
+REBOOTING = []
+STOPPING = []
+RUNNING = ['ACTIVE']
+STOPPED = ['STOPPED']
+DEALLOCATED = []
+TERMINATED = ['SOFT_DELETED', 'DELETED']
+STARTING = []
+PROVISIONING = ['BUILDING', 'BUILD']
+STAGING = ['SHELVED', 'SHELVED_OFFLOADED', 'RESCUED']
+SUSPENDING = []
+DEALLOCATING = []
+SUSPENDED = ['PAUSED', 'SUSPENDED']
+REPAIRING = []
 
 
 class InstanceResource(BaseResource):
@@ -128,24 +138,32 @@ class InstanceResource(BaseResource):
             ip_addresses = []
             nics = []
             addresses = resource.addresses
+            primary_ip_address = None
 
             for network_name, network_values in addresses.items():
                 for network_value in network_values:
+
+                    ip_address = network_value.get("addr")
+
+                    if network_value.get("addr"):
+                        ip_addresses.append(ip_address)
+
                     nic = {'device_index': index, 'mac_address': network_value.get("OS-EXT-IPS-MAC:mac_addr"),
-                           'ip_addresses': network_value.get("addr")}
+                           'ip_addresses': [ip_address]}
 
                     nics.append(nic)
 
-                    if network_value.get("addr"):
-                        ip_addresses.append(network_value.get("addr"))
+                    if not primary_ip_address:
+                        if network_value.get("OS-EXT-IPS:type") == 'fixed' and network_value.get("version") == 4:
+                            primary_ip_address = ip_address
 
                     index += 1
 
             self._set_obj_key_value(model_obj, 'nics', nics)
             self._set_obj_key_value(model_obj, 'ip_addresses', ip_addresses)
 
-            if ip_addresses:
-                self._set_obj_key_value(model_obj, 'primary_ip_address', ip_addresses[0])
+            if primary_ip_address:
+                self._set_obj_key_value(model_obj, 'primary_ip_address', primary_ip_address)
 
         if model_obj.volumes:
             index = 0
@@ -188,14 +206,34 @@ class InstanceResource(BaseResource):
         if resource.get('vm_state'):
             vm_state = str(resource.vm_state).upper()
 
-            if vm_state in INSERVICE:
-                compute['instance_state'] = 'INSERVICE'
-            elif vm_state in MAINTENANCE:
-                compute['instance_state'] = 'MAINTENANCE'
-            elif vm_state in CLOSED:
-                compute['instance_state'] = 'CLOSED'
-            elif vm_state in DELETED:
-                compute['instance_state'] = 'DELETED'
+            if vm_state in PENDING:
+                compute['instance_state'] = 'Pending'
+            elif vm_state in REBOOTING:
+                compute['instance_state'] = 'Rebooting'
+            elif vm_state in STOPPING:
+                compute['instance_state'] = 'Stopping'
+            elif vm_state in RUNNING:
+                compute['instance_state'] = 'Running'
+            elif vm_state in STOPPED:
+                compute['instance_state'] = 'Stopped'
+            elif vm_state in DEALLOCATED:
+                compute['instance_state'] = 'Deallocated'
+            elif vm_state in TERMINATED:
+                compute['instance_state'] = 'Terminated'
+            elif vm_state in STARTING:
+                compute['instance_state'] = 'Starting'
+            elif vm_state in PROVISIONING:
+                compute['instance_state'] = 'Provisioning'
+            elif vm_state in STAGING:
+                compute['instance_state'] = 'Staging'
+            elif vm_state in SUSPENDING:
+                compute['instance_state'] = 'Suspending'
+            elif vm_state in DEALLOCATING:
+                compute['instance_state'] = 'Deallocating'
+            elif vm_state in SUSPENDED:
+                compute['instance_state'] = 'Suspended'
+            elif vm_state in REPAIRING:
+                compute['instance_state'] = 'Repairing'
 
         if resource.get('security_groups'):
             security_groups = list(dic['name'] for dic in resource.security_groups)
