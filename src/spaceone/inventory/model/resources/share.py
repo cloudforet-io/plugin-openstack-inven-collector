@@ -40,6 +40,6 @@ class ShareNetworkModel(ResourceModel):
     updated_at = DateTimeType()
     gateway = StringType()
     mtu = StringType()
-    share_network_subnets = ListType(DictType(StringType))
+    share_network_subnets = ListType(DictType(StringType), default=[])
     security_service_update_support = BooleanType()
     status = StringType()

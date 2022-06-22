@@ -12,7 +12,19 @@ class NicModel(ResourceModel):
     version = IntType()
 
 
-class InstanceModel(ResourceModel):
+# for spaceone server standard schema
+class SeverSchemaModel(ResourceModel):
+    primary_ip_address = IPAddressType(serialize_when_none=False)
+    ip_addresses = ListType(IPAddressType, default=[], serialize_when_none=False)
+    nics = ListType(DictType(StringType, default={}), serialize_when_none=False)
+    disks = ListType(DictType(StringType, default={}), serialize_when_none=False)
+    hardware = DictType(StringType, serialize_when_none=False)
+    compute = DictType(StringType, serialize_when_none=False)
+    security_group = ListType(DictType(StringType, default={}), serialize_when_none=False)
+    size = IntType(serialize_when_none=False)
+
+
+class InstanceModel(SeverSchemaModel):
     id = StringType()
     name = StringType()
     description = StringType()

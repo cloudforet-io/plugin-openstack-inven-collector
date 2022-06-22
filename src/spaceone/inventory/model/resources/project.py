@@ -11,4 +11,4 @@ class ProjectModel(ResourceModel):
     is_enabled = BooleanType()
     options = StringType()
     parent_id = StringType()
-    quota_sets = ListType(DictType(StringType))
+    quota_sets = ListType(StringType, default=[])

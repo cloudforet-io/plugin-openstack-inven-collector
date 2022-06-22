@@ -30,7 +30,7 @@ class ProjectResource(BaseResource):
 
             for key, value in compute_quota_set_detail.items():
 
-                if isinstance(value, dict) and compute_quota_set_detail:
+                if isinstance(value, dict):
 
                     quota_set = {
                         "name": key,
@@ -47,6 +47,7 @@ class ProjectResource(BaseResource):
                     quota_set_list.append(quota_set)
 
         if volume_quota_set_detail:
+
             volume_quota_set_detail = volume_quota_set_detail.to_primitive()
 
             search_keys = ["backup_gigabytes", "backups", "gigabytes", "groups", "per_volume_gigabytes", "snapshots",

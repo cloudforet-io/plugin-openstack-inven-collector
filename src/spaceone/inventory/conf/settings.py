@@ -10,6 +10,7 @@ _LOGGER = logging.getLogger(__name__)
 
 DEBUG_ENABLED: bool = False
 DEFAULT_LOG_LEVEL = logging.INFO
+#DEFAULT_LOG_LEVEL = logging.DEBUG
 
 try:
     OS_DEBUG_ENABLED = os.getenv("DEBUG_ENABLED")

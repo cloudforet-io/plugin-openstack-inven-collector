@@ -4,7 +4,6 @@ from spaceone.inventory.libs.common_parser import get_data_from_yaml
 from spaceone.inventory.manager.resources.metadata.metaman import CSTMetaGenerator
 from spaceone.inventory.model.common.response import CloudServiceTypeResource
 from spaceone.inventory.model.view.cloud_service_type import CloudServiceTypeMeta
-from spaceone.inventory.model.view.dynamic_field import TextDyField, EnumDyField, BadgeDyField
 from spaceone.inventory.model.view.dynamic_widget import ChartWidget, CardWidget
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -32,52 +31,47 @@ CLOUD_SERVICE_TYPE.tags = {
 
 CST_HV_META = CSTMetaGenerator()
 
-CST_HV_META.append_cst_meta_field(TextDyField, 'Name', 'data.name')
-CST_HV_META.append_cst_meta_field(BadgeDyField, 'ID', 'data.id', auto_search=True,
-                                  reference={"resource_type": "inventory.CloudService",
-                                             "reference_key": "reference.resource_id"},
-                                  options={'is_optional': True})
-CST_HV_META.append_cst_meta_field(TextDyField, 'Instances Count', 'data.running_vms', auto_search=True)
-CST_HV_META.append_cst_meta_field(EnumDyField, 'State', 'data.state', auto_search=True,
+CST_HV_META.append_cst_meta_field('TextDyField', 'Instances Count', 'data.running_vms', auto_search=True)
+CST_HV_META.append_cst_meta_field('EnumDyField', 'State', 'data.state', auto_search=True,
                                   default_badge={
                                       'green.500': ['UP'], 'red.500': ['DOWN']
                                   })
-CST_HV_META.append_cst_meta_field(EnumDyField, 'Status', 'data.status', auto_search=True,
+CST_HV_META.append_cst_meta_field('EnumDyField', 'Status', 'data.status', auto_search=True,
                                   default_badge={
                                       'green.500': ['ENABLED'], 'gray.500': ['DISABLED']
                                   })
-CST_HV_META.append_cst_meta_field(TextDyField, 'IP Address', 'data.host_ip', auto_search=True)
-CST_HV_META.append_cst_meta_field(TextDyField, 'Type', 'data.hypervisor_type', auto_search=True)
+CST_HV_META.append_cst_meta_field('TextDyField', 'IP Address', 'data.host_ip', auto_search=True)
+CST_HV_META.append_cst_meta_field('TextDyField', 'Type', 'data.hypervisor_type', auto_search=True)
 
-CST_HV_META.append_cst_meta_field(TextDyField, 'vCPU(total)', 'data.vcpus', auto_search=True, data_type=int)
-CST_HV_META.append_cst_meta_field(TextDyField, 'vCPU(used)', 'data.vcpus_used', auto_search=True, data_type=int)
-CST_HV_META.append_cst_meta_field(TextDyField, 'vCPU(ratio)', 'data.vcpus_allocation_ratio', auto_search=True,
+CST_HV_META.append_cst_meta_field('TextDyField', 'vCPU(total)', 'data.vcpus', auto_search=True, data_type=int)
+CST_HV_META.append_cst_meta_field('TextDyField', 'vCPU(used)', 'data.vcpus_used', auto_search=True, data_type=int)
+CST_HV_META.append_cst_meta_field('TextDyField', 'vCPU(ratio)', 'data.vcpus_allocation_ratio', auto_search=True,
                                   data_type=int)
-CST_HV_META.append_cst_meta_field(TextDyField, 'vCPU(free)', 'data.vcpus_free', auto_search=True, data_type=int)
-CST_HV_META.append_cst_meta_field(TextDyField, 'vCPU Model', 'data.cpu_info.model', auto_search=True)
-CST_HV_META.append_cst_meta_field(TextDyField, 'Memory(total)', 'data.memory_size', auto_search=True, data_type=int,
+CST_HV_META.append_cst_meta_field('TextDyField', 'vCPU(free)', 'data.vcpus_free', auto_search=True, data_type=int)
+CST_HV_META.append_cst_meta_field('TextDyField', 'vCPU Model', 'data.cpu_info.model', auto_search=True)
+CST_HV_META.append_cst_meta_field('TextDyField', 'Memory(total)', 'data.memory_size', auto_search=True, data_type=int,
                                   type="size", options={"source_unit": "MB"})
-CST_HV_META.append_cst_meta_field(TextDyField, 'Memory(used)', 'data.memory_used', auto_search=True, data_type=int,
+CST_HV_META.append_cst_meta_field('TextDyField', 'Memory(used)', 'data.memory_used', auto_search=True, data_type=int,
                                   type="size", options={"source_unit": "MB"})
-CST_HV_META.append_cst_meta_field(TextDyField, 'Memory(ratio)', 'data.memory_allocation_ratio', auto_search=True,
+CST_HV_META.append_cst_meta_field('TextDyField', 'Memory(ratio)', 'data.memory_allocation_ratio', auto_search=True,
                                   data_type=int,
                                   options={'is_optional': True})
-CST_HV_META.append_cst_meta_field(TextDyField, 'Memory(free)', 'data.memory_free', auto_search=True, data_type=int,
+CST_HV_META.append_cst_meta_field('TextDyField', 'Memory(free)', 'data.memory_free', auto_search=True, data_type=int,
                                   type="size", options={"source_unit": "MB", 'is_optional': True})
-CST_HV_META.append_cst_meta_field(TextDyField, 'Local Storage(total)', 'data.local_disk_size', auto_search=True,
+CST_HV_META.append_cst_meta_field('TextDyField', 'Local Storage(total)', 'data.local_disk_size', auto_search=True,
                                   data_type=int,
                                   type="size", options={"source_unit": "GB"})
-CST_HV_META.append_cst_meta_field(TextDyField, 'Local Storage(used)', 'data.local_disk_used', auto_search=True,
+CST_HV_META.append_cst_meta_field('TextDyField', 'Local Storage(used)', 'data.local_disk_used', auto_search=True,
                                   data_type=int,
                                   type="size", options={"source_unit": "GB", "display_unit": "GB"})
-CST_HV_META.append_cst_meta_field(TextDyField, 'Local Storage(ratio)', 'data.local_disk_allocation_ratio',
+CST_HV_META.append_cst_meta_field('TextDyField', 'Local Storage(ratio)', 'data.local_disk_allocation_ratio',
                                   auto_search=True, data_type=int,
                                   options={'is_optional': True})
-CST_HV_META.append_cst_meta_field(TextDyField, 'Local Storage(free)', 'data.local_disk_free', auto_search=True,
+CST_HV_META.append_cst_meta_field('TextDyField', 'Local Storage(free)', 'data.local_disk_free', auto_search=True,
                                   data_type=int,
                                   type="size", options={"source_unit": "GB", "display_unit": "GB", 'is_optional': True})
-CST_HV_META.append_cst_meta_field(TextDyField, 'Availability Zone', 'data.availability_zone', auto_search=True)
-CST_HV_META.append_cst_meta_field(TextDyField, 'Uptime', 'data.uptime', auto_search=True,
+CST_HV_META.append_cst_meta_field('TextDyField', 'Availability Zone', 'data.availability_zone', auto_search=True)
+CST_HV_META.append_cst_meta_field('TextDyField', 'Uptime', 'data.uptime', auto_search=True,
                                   options={'is_optional': True})
 
 CLOUD_SERVICE_TYPE._metadata = CloudServiceTypeMeta.set_meta(

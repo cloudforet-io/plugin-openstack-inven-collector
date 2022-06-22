@@ -20,7 +20,10 @@ class CloudServiceReferenceModel(Model):
 
 class CloudServiceResource(Model):
     provider = StringType(default="openstack")
-    account = StringType()
+    account = StringType(serialize_when_none=False)
+    ip_addresses = ListType(StringType(), serialize_when_none=False)
+    state = StringType(serialize_when_none=False)
+    server_type = StringType(serialize_when_none=False)
     instance_type = StringType(serialize_when_none=False)
     instance_size = FloatType(serialize_when_none=False)
     launched_at = StringType(serialize_when_none=False)

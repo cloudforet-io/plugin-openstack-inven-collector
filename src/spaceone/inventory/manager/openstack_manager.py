@@ -69,6 +69,9 @@ class OpenstackManager(BaseManager):
     @property
     def region_code(self) -> Optional[str]:
         if self._secret_data:
+            if self._secret_data.get('region_code'):
+                return self._secret_data.get('region_code')
+
             return self._secret_data.get('region_name')
         return None
 
@@ -184,15 +187,32 @@ class OpenstackManager(BaseManager):
                     getattr(collected_resource_model, 'project_id'):
                 project_id = collected_resource_model.project_id
 
-            resource = CloudServiceResource({'data': collected_resource_model,
-                                             'name': name,
-                                             'account': project_id,
-                                             'reference': reference,
-                                             'region_code': self.region_code,
-                                             '_metadata': resource_obj.cloud_service_meta,
-                                             'cloud_service_group': resource_obj.cloud_service_group_name,
-                                             'cloud_service_type': resource_obj.cloud_service_type_name,
-                                             'instance_size': instance_size})
+            cloud_service_response = {'data': collected_resource_model,
+                                      'name': name,
+                                      'account': project_id,
+                                      'reference': reference,
+                                      'region_code': self.region_code,
+                                      '_metadata': resource_obj.cloud_service_meta,
+                                      'cloud_service_group': resource_obj.cloud_service_group_name,
+                                      'cloud_service_type': resource_obj.cloud_service_type_name,
+                                      'instance_size': instance_size}
+
+            # for spaceone standard server schema
+            if resource_obj.cloud_service_type_name == 'Instance':
+                if hasattr(collected_resource_model, 'ip_addresses') and \
+                        getattr(collected_resource_model, 'ip_addresses'):
+                    ip_addresses = collected_resource_model.ip_addresses
+                    cloud_service_response['ip_addresses'] = ip_addresses
+
+                if hasattr(collected_resource_model, 'compute') and \
+                        getattr(collected_resource_model, 'compute'):
+
+                    cloud_service_response['instance_type'] = collected_resource_model.compute.get('instance_type')
+                    cloud_service_response['state'] = collected_resource_model.compute.get('instance_state')
+
+                cloud_service_response['server_type'] = 'VM'
+
+            resource = CloudServiceResource(cloud_service_response)
 
             _LOGGER.debug(resource.to_primitive())
             yield CloudServiceResponse({'resource': resource})

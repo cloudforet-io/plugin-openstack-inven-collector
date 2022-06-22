@@ -20,7 +20,7 @@ class VolumeModel(ResourceModel):
     host = StringType()
     status = StringType()
     metadata = DictType(StringType, default={})
-    attachments = ListType(StringType, default=[])
+    attachments = ListType(DictType(StringType), default=[])
     volume_image_metadata = DictType(StringType, serialize_when_none=False)
     created_at = DateTimeType()
     launched_at = DateTimeType()

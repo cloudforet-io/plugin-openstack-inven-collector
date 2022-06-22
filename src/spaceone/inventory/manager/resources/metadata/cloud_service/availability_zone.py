@@ -6,13 +6,16 @@ from spaceone.inventory.model.view.dynamic_layout import ItemDynamicLayout, Tabl
 
 CS_COMPUTE_ZONE_META = CSTMetaGenerator(CST_COMPUTE_ZONE_META)
 
+CS_COMPUTE_ZONE_META.append_cst_meta_field('TextDyField', 'ID', 'data.id', index=0)
+CS_COMPUTE_ZONE_META.append_cst_meta_field('TextDyField', 'Name', 'data.name', index=1)
 CLOUD_SERVICE_BASE = ItemDynamicLayout.set_fields('Availability Zone', fields=CS_COMPUTE_ZONE_META.fields)
 
 CS_COMPUTE_ZONE_HV_META = CSTMetaGenerator(CST_HV_META)
+CS_COMPUTE_ZONE_HV_META.append_cst_meta_field('TextDyField', 'Name', 'data.name', index=0)
 CS_COMPUTE_ZONE_HV_META.delete_cst_meta_field("Availability Zone")
 
-CLOUD_SERVICE_HYPERVISOR = TableDynamicLayout.set_fields('Hypervisors', fields=CS_COMPUTE_ZONE_HV_META.get_table_fields(
-    ignore_root_path='data'),
-                                                         root_path="data.hypervisors")
+CLOUD_SERVICE_HYPERVISOR = TableDynamicLayout.set_fields('Hypervisors',
+                                                         fields=CS_COMPUTE_ZONE_HV_META.get_table_fields(
+                                                             ignore_data_path=True), root_path="data.hypervisors")
 
 CLOUD_SERVICE_METADATA = CloudServiceMeta.set_layouts(layouts=[CLOUD_SERVICE_BASE, CLOUD_SERVICE_HYPERVISOR])

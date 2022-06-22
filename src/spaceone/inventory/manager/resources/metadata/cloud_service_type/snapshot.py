@@ -4,7 +4,6 @@ from spaceone.inventory.libs.common_parser import get_data_from_yaml
 from spaceone.inventory.manager.resources.metadata.metaman import CSTMetaGenerator
 from spaceone.inventory.model.common.response import CloudServiceTypeResource
 from spaceone.inventory.model.view.cloud_service_type import CloudServiceTypeMeta
-from spaceone.inventory.model.view.dynamic_field import TextDyField, EnumDyField, BadgeDyField, DateTimeDyField
 from spaceone.inventory.model.view.dynamic_widget import ChartWidget, CardWidget
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -27,10 +26,7 @@ CLOUD_SERVICE_TYPE.tags = {
 
 CST_SNAPSHOT_META = CSTMetaGenerator()
 
-CST_SNAPSHOT_META.append_cst_meta_field(TextDyField, 'Name', 'data.name')
-CST_SNAPSHOT_META.append_cst_meta_field(TextDyField, 'ID', 'data.id', auto_search=True,
-                                        options={'is_optional': True})
-CST_SNAPSHOT_META.append_cst_meta_field(EnumDyField, 'Status', 'data.status', auto_search=True,
+CST_SNAPSHOT_META.append_cst_meta_field('EnumDyField', 'Status', 'data.status', auto_search=True,
                                         default_state={
                                             'safe': ['in-use'],
                                             'available': ['available', 'reserved'],
@@ -39,18 +35,18 @@ CST_SNAPSHOT_META.append_cst_meta_field(EnumDyField, 'Status', 'data.status', au
                                             'disable': ['deleted'],
                                             'alert': ['error', 'error_deleting']
                                         })
-CST_SNAPSHOT_META.append_cst_meta_field(TextDyField, 'Size', 'data.size_gb', auto_search=True, data_type=int,
+CST_SNAPSHOT_META.append_cst_meta_field('TextDyField', 'Size', 'data.size_gb', auto_search=True, data_type=int,
                                         type="size", options={"source_unit": "GB"})
-CST_SNAPSHOT_META.append_cst_meta_field(BadgeDyField, 'Volume ID', 'data.volume_id', auto_search=True,
+CST_SNAPSHOT_META.append_cst_meta_field('BadgeDyField', 'Volume ID', 'data.volume_id', auto_search=True,
                                         reference={"resource_type": "inventory.CloudService",
                                                    "reference_key": "reference.resource_id"},
                                         )
-CST_SNAPSHOT_META.append_cst_meta_field(TextDyField, 'Project Name', 'data.project_name', auto_search=True)
-CST_SNAPSHOT_META.append_cst_meta_field(BadgeDyField, 'Project ID', 'data.project_id', auto_search=True,
+CST_SNAPSHOT_META.append_cst_meta_field('TextDyField', 'Project Name', 'data.project_name', auto_search=True)
+CST_SNAPSHOT_META.append_cst_meta_field('BadgeDyField', 'Project ID', 'data.project_id', auto_search=True,
                                         reference={"resource_type": "inventory.CloudService",
                                                    "reference_key": "reference.resource_id"},
                                         )
-CST_SNAPSHOT_META.append_cst_meta_field(DateTimeDyField, 'Created', 'data.created_at', auto_search=True)
+CST_SNAPSHOT_META.append_cst_meta_field('DateTimeDyField', 'Created', 'data.created_at', auto_search=True)
 
 CLOUD_SERVICE_TYPE._metadata = CloudServiceTypeMeta.set_meta(
     fields=CST_SNAPSHOT_META.fields, search=CST_SNAPSHOT_META.search,

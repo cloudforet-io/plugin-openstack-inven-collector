@@ -4,7 +4,6 @@ from spaceone.inventory.libs.common_parser import get_data_from_yaml
 from spaceone.inventory.manager.resources.metadata.metaman import CSTMetaGenerator
 from spaceone.inventory.model.common.response import CloudServiceTypeResource
 from spaceone.inventory.model.view.cloud_service_type import CloudServiceTypeMeta
-from spaceone.inventory.model.view.dynamic_field import TextDyField, EnumDyField, BadgeDyField, ListDyField
 from spaceone.inventory.model.view.dynamic_widget import ChartWidget, CardWidget
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -27,28 +26,23 @@ CLOUD_SERVICE_TYPE.tags = {
 
 CST_SG_META = CSTMetaGenerator()
 
-CST_SG_META.append_cst_meta_field(TextDyField, 'Name', 'data.name')
-CST_SG_META.append_cst_meta_field(BadgeDyField, 'ID', 'data.id', auto_search=True,
-                                  reference={"resource_type": "inventory.CloudService",
-                                             "reference_key": "reference.resource_id"},
-                                  options={'is_optional': True})
-CST_SG_META.append_cst_meta_field(EnumDyField, 'Policy', 'data.policy', auto_search=True,
+CST_SG_META.append_cst_meta_field('EnumDyField', 'Policy', 'data.policy', auto_search=True,
                                   default_badge={
                                       'coral.600': ['anti-affinity'], 'indigo.500': ['affinity'],
                                       'peacock.500': ['soft-anti-affinity'], 'violet.500': ['soft-affinity']})
-CST_SG_META.append_cst_meta_field(TextDyField, 'Instance Count', 'data.member_count', auto_search=True, data_type=int)
-CST_SG_META.append_cst_meta_field(ListDyField, 'Instances', 'data.member_ids', auto_search=True,
+CST_SG_META.append_cst_meta_field('TextDyField', 'Instance Count', 'data.member_count', auto_search=True, data_type=int)
+CST_SG_META.append_cst_meta_field('ListDyField', 'Instances', 'data.member_ids', auto_search=True,
                                   reference={"resource_type": "inventory.CloudService",
                                              "reference_key": "reference.resource_id"},
                                   default_badge={"type": "reference", 'delimiter': ' ', 'sub_key': 'server_id'},
                                   options={'is_optional': True}
                                   )
-CST_SG_META.append_cst_meta_field(TextDyField, 'Project Name', 'data.project_name', auto_search=True)
-CST_SG_META.append_cst_meta_field(BadgeDyField, 'Project Id', 'data.project_id', auto_search=True,
+CST_SG_META.append_cst_meta_field('TextDyField', 'Project Name', 'data.project_name', auto_search=True)
+CST_SG_META.append_cst_meta_field('BadgeDyField', 'Project Id', 'data.project_id', auto_search=True,
                                   reference={"resource_type": "inventory.CloudService",
                                              "reference_key": "reference.resource_id"},
                                   )
-CST_SG_META.append_cst_meta_field(BadgeDyField, 'User Id', 'data.user_id', auto_search=True,
+CST_SG_META.append_cst_meta_field('BadgeDyField', 'User Id', 'data.user_id', auto_search=True,
                                   reference={"resource_type": "inventory.CloudService",
                                              "reference_key": "reference.resource_id"},
                                   )

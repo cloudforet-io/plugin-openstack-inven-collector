@@ -4,7 +4,6 @@ from spaceone.inventory.libs.common_parser import get_data_from_yaml
 from spaceone.inventory.manager.resources.metadata.metaman import CSTMetaGenerator
 from spaceone.inventory.model.common.response import CloudServiceTypeResource
 from spaceone.inventory.model.view.cloud_service_type import CloudServiceTypeMeta
-from spaceone.inventory.model.view.dynamic_field import TextDyField, EnumDyField
 from spaceone.inventory.model.view.dynamic_widget import ChartWidget, CardWidget
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -27,25 +26,24 @@ CLOUD_SERVICE_TYPE.tags = {
 
 CST_COMPUTE_ZONE_META = CSTMetaGenerator()
 
-CST_COMPUTE_ZONE_META.append_cst_meta_field(TextDyField, 'Name', 'data.name', auto_search=True)
-CST_COMPUTE_ZONE_META.append_cst_meta_field(TextDyField, 'Instances', 'data.total_running_vms', auto_search=True,
+CST_COMPUTE_ZONE_META.append_cst_meta_field('TextDyField', 'Instances', 'data.total_running_vms', auto_search=True,
                                             data_type=int)
-CST_COMPUTE_ZONE_META.append_cst_meta_field(TextDyField, 'vCPU(total)', 'data.total_vcpus', auto_search=True,
+CST_COMPUTE_ZONE_META.append_cst_meta_field('TextDyField', 'vCPU(total)', 'data.total_vcpus', auto_search=True,
                                             data_type=int)
-CST_COMPUTE_ZONE_META.append_cst_meta_field(TextDyField, 'vCPU(used)', 'data.total_vcpus_used', auto_search=True,
+CST_COMPUTE_ZONE_META.append_cst_meta_field('TextDyField', 'vCPU(used)', 'data.total_vcpus_used', auto_search=True,
                                             data_type=int)
-CST_COMPUTE_ZONE_META.append_cst_meta_field(TextDyField, 'vCPU(free)', 'data.total_vcpus_free', auto_search=True,
+CST_COMPUTE_ZONE_META.append_cst_meta_field('TextDyField', 'vCPU(free)', 'data.total_vcpus_free', auto_search=True,
                                             data_type=int)
-CST_COMPUTE_ZONE_META.append_cst_meta_field(TextDyField, 'MEM(total)', 'data.total_memory_size', auto_search=True,
+CST_COMPUTE_ZONE_META.append_cst_meta_field('TextDyField', 'MEM(total)', 'data.total_memory_size', auto_search=True,
                                             data_type=int,
                                             type="size", options={"source_unit": "MB"})
-CST_COMPUTE_ZONE_META.append_cst_meta_field(TextDyField, 'MEM(used)', 'data.total_memory_used', auto_search=True,
+CST_COMPUTE_ZONE_META.append_cst_meta_field('TextDyField', 'MEM(used)', 'data.total_memory_used', auto_search=True,
                                             data_type=int,
                                             type="size", options={"source_unit": "MB"})
-CST_COMPUTE_ZONE_META.append_cst_meta_field(TextDyField, 'MEM(free)', 'data.total_memory_free', auto_search=True,
+CST_COMPUTE_ZONE_META.append_cst_meta_field('TextDyField', 'MEM(free)', 'data.total_memory_free', auto_search=True,
                                             data_type=int,
                                             type="size", options={"source_unit": "MB"})
-CST_COMPUTE_ZONE_META.append_cst_meta_field(EnumDyField, 'State', 'data.state.available', auto_search=True,
+CST_COMPUTE_ZONE_META.append_cst_meta_field('EnumDyField', 'State', 'data.state.available', auto_search=True,
                                             default_badge={
                                                 'indigo.500': ['true'], 'coral.600': ['false']})
 

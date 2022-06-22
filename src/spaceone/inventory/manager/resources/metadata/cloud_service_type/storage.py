@@ -4,7 +4,6 @@ from spaceone.inventory.libs.common_parser import get_data_from_yaml
 from spaceone.inventory.manager.resources.metadata.metaman import CSTMetaGenerator
 from spaceone.inventory.model.common.response import CloudServiceTypeResource
 from spaceone.inventory.model.view.cloud_service_type import CloudServiceTypeMeta
-from spaceone.inventory.model.view.dynamic_field import TextDyField, EnumDyField, BadgeDyField
 from spaceone.inventory.model.view.dynamic_widget import ChartWidget, CardWidget
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -31,35 +30,30 @@ CLOUD_SERVICE_TYPE.tags = {
 
 CST_STORAGE_META = CSTMetaGenerator()
 
-CST_STORAGE_META.append_cst_meta_field(TextDyField, 'Name', 'data.name')
-CST_STORAGE_META.append_cst_meta_field(BadgeDyField, 'ID', 'data.id', auto_search=True,
-                                       reference={"resource_type": "inventory.CloudService",
-                                                  "reference_key": "reference.resource_id"},
+CST_STORAGE_META.append_cst_meta_field('TextDyField', 'Display Name', 'data.display_name', auto_search=True,
                                        options={'is_optional': True})
-CST_STORAGE_META.append_cst_meta_field(TextDyField, 'Display Name', 'data.display_name', auto_search=True,
+CST_STORAGE_META.append_cst_meta_field('TextDyField', 'Namespace', 'data.namespace', auto_search=True,
                                        options={'is_optional': True})
-CST_STORAGE_META.append_cst_meta_field(TextDyField, 'Namespace', 'data.namespace', auto_search=True,
-                                       options={'is_optional': True})
-CST_STORAGE_META.append_cst_meta_field(EnumDyField, 'Protocol', 'data.storage_protocol', auto_search=True,
+CST_STORAGE_META.append_cst_meta_field('EnumDyField', 'Protocol', 'data.storage_protocol', auto_search=True,
                                        default_badge={
                                            'coral.600': ['nfs'], 'indigo.500': ['iSCSI'], 'peacock.500': ['cephfs']})
-CST_STORAGE_META.append_cst_meta_field(EnumDyField, 'Vendor', 'data.vendor_name', auto_search=True,
+CST_STORAGE_META.append_cst_meta_field('EnumDyField', 'Vendor', 'data.vendor_name', auto_search=True,
                                        default_badge={
                                            'blue.600': ['NetApp'], 'indigo.500': ['HPE'], 'peacock.500': ['EMC'],
                                            'green.500': ['Open Source'], 'red.500': ['Dell'], 'violet.500': ['Ceph']})
-CST_STORAGE_META.append_cst_meta_field(TextDyField, 'Backend Name', 'data.volume_backend_name', auto_search=True)
+CST_STORAGE_META.append_cst_meta_field('TextDyField', 'Backend Name', 'data.volume_backend_name', auto_search=True)
 
-CST_STORAGE_META.append_cst_meta_field(TextDyField, 'Allocated Volume Size', 'data.total_allocated_volume_size',
+CST_STORAGE_META.append_cst_meta_field('TextDyField', 'Allocated Volume Size', 'data.total_allocated_volume_size',
                                        auto_search=True, data_type=int, type="size",
                                        options={"source_unit": "GB", "display_unit": "GB"})
-CST_STORAGE_META.append_cst_meta_field(TextDyField, 'Volume Count', 'data.total_volume_count',
+CST_STORAGE_META.append_cst_meta_field('TextDyField', 'Volume Count', 'data.total_volume_count',
                                        auto_search=True, data_type=int)
-CST_STORAGE_META.append_cst_meta_field(TextDyField, 'Attached Volume Count', 'data.attached_volume_count',
+CST_STORAGE_META.append_cst_meta_field('TextDyField', 'Attached Volume Count', 'data.attached_volume_count',
                                        auto_search=True, data_type=int)
-CST_STORAGE_META.append_cst_meta_field(TextDyField, 'Available Volume Count', 'data.available_volume_count',
+CST_STORAGE_META.append_cst_meta_field('TextDyField', 'Available Volume Count', 'data.available_volume_count',
                                        auto_search=True, data_type=int)
 
-CST_STORAGE_META.append_cst_meta_field(TextDyField, 'Driver Version', 'data.driver_version', auto_search=True)
+CST_STORAGE_META.append_cst_meta_field('TextDyField', 'Driver Version', 'data.driver_version', auto_search=True)
 
 CLOUD_SERVICE_TYPE._metadata = CloudServiceTypeMeta.set_meta(
     fields=CST_STORAGE_META.fields, search=CST_STORAGE_META.search,

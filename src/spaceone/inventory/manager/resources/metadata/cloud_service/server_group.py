@@ -2,13 +2,15 @@ from spaceone.inventory.manager.resources.metadata.cloud_service.compute import 
 from spaceone.inventory.manager.resources.metadata.cloud_service_type.server_group import CST_SG_META
 from spaceone.inventory.manager.resources.metadata.metaman import CSTMetaGenerator
 from spaceone.inventory.model.view.cloud_service import CloudServiceMeta
-from spaceone.inventory.model.view.dynamic_field import TextDyField
 from spaceone.inventory.model.view.dynamic_layout import ItemDynamicLayout, TableDynamicLayout
 
 CS_SG_META = CSTMetaGenerator(CST_SG_META)
-CS_SG_META.append_cst_meta_field(TextDyField, 'Policies', 'data.policies')
-CS_SG_META.append_cst_meta_field(TextDyField, 'Metadata', 'data.metadata')
-CS_SG_META.append_cst_meta_field(TextDyField, 'Rules', 'data.rules')
+
+CS_SG_META.append_cst_meta_field('TextDyField', 'ID', 'data.id', index=0)
+CS_SG_META.insert_cst_meta_field('ID', 'TextDyField', 'Name', 'data.name')
+CS_SG_META.append_cst_meta_field('TextDyField', 'Policies', 'data.policies')
+CS_SG_META.append_cst_meta_field('TextDyField', 'Metadata', 'data.metadata')
+CS_SG_META.append_cst_meta_field('TextDyField', 'Rules', 'data.rules')
 
 CLOUD_SERVICE_BASE = ItemDynamicLayout.set_fields('Server Group', fields=CS_SG_META.fields)
 
