@@ -208,9 +208,9 @@ class OpenstackManager(BaseManager):
                         getattr(collected_resource_model, 'compute'):
 
                     cloud_service_response['instance_type'] = collected_resource_model.compute.get('instance_type')
-                    cloud_service_response['state'] = collected_resource_model.compute.get('instance_state')
+                    # cloud_service_response['state'] = collected_resource_model.compute.get('instance_state')
 
-                cloud_service_response['server_type'] = 'VM'
+                # cloud_service_response['server_type'] = 'VM'
 
             resource = CloudServiceResource(cloud_service_response)
 
