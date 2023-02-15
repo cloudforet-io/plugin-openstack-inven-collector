@@ -8,6 +8,7 @@ ENV SRC_DIR /tmp/src
 ENV OPENSTACK_PKG_DIR /usr/local/lib/python3.8/site-packages/openstack
 
 RUN apt update && apt upgrade -y
+RUN apt install gcc -y
 
 COPY pkg/*.txt ${PKG_DIR}/
 
